@@ -100,6 +100,11 @@ pub fn evaluate_bm25(bm25: &BM25) {
             .map(|e| e.document_id.as_str())
             .collect();
 
+        if !is_hit(&retrieved, &gold, 5) {
+            println!("\nMISS: {}", claim.text);
+            println!("Gold: {:?}", gold);
+            println!("Retrieved: {:?}", retrieved);
+}
         if is_hit(&retrieved, &gold, 1) {
             r1 += 1;
         }
