@@ -1,4 +1,8 @@
-mod retriever;
+mod overlap;
+mod evaluation;
+mod bm25;
+
+
 use serde::Deserialize;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -33,22 +37,9 @@ fn main() {
 
     println!("Loaded {} documents.", documents.len());
 
-    let claim = "1 in 5 million in UK have abnormal PrP positivity.";
+    evaluation::evaluate_overlap(&documents);
 
-    println!("\nClaim:");
-    println!("{claim}");
+    let bm25 = bm25::BM25::new(documents);
 
-    println!("\nTop evidence:");
-
-    let results = retriever::search(claim, &documents, 5);
-
-    for (rank, (document, score)) in results.iter().enumerate() {
-        println!(
-            "{}. {} | score={} | {}",
-            rank + 1,
-            document.document_id,
-            score,
-            document.title
-        );
-    }
+    evaluation::evaluate_bm25(&bm25);
 }

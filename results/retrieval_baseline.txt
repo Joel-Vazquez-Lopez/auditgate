@@ -1,0 +1,15 @@
+AuditGate Retrieval Experiments
+===============================
+
+Dataset: SciFact
+Corpus: 5,183 scientific abstracts
+Evaluation: 100 evidence-bearing claims
+Metric: gold-document Recall@k
+
+                    R@1     R@3     R@5
+Word overlap       0.440   0.560   0.610
+BM25               0.760   0.860   0.890
+
+BM25 parameters:
+k1 = 1.5
+b = 0.75
