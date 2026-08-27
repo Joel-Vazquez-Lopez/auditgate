@@ -1,0 +1,30 @@
+AuditGate Verifier Experiments
+==============================
+
+Dataset: SciFact dev
+Evaluation: 188 evidence-bearing claims
+Evidence: gold SciFact rationale sentences
+
+Experiment 1: Generic zero-shot NLI
+Model: cross-encoder/nli-deberta-v3-base
+
+Accuracy: 0.415
+
+Confusion matrix:
+
+Gold supported (124):
+  supported: 41
+  contradicted: 5
+  insufficient_evidence: 78
+
+Gold contradicted (64):
+  supported: 2
+  contradicted: 37
+  insufficient_evidence: 25
+
+Notes:
+- Direct support/contradiction errors: 7
+- Model frequently predicts neutral on scientific inference.
+- Numerical and domain-specific reasoning are notable failure modes.
+- Neutral should not automatically be interpreted as system-level
+  insufficient evidence.
