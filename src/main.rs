@@ -1,11 +1,13 @@
-mod overlap;
-mod evaluation;
 mod bm25;
+mod decision;
+mod reranker;
 
 
-use serde::Deserialize;
+use clap::Parser;
+use serde::{Deserialize, Serialize};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
+use std::process::{Command, Stdio};
 
 #[derive(Deserialize)]
 struct Passage {
@@ -19,9 +21,39 @@ struct Document {
     passages: Vec<Passage>,
 }
 
+
+// --------------------------------------------------
+// Verifier data structures
+// --------------------------------------------------
+
+#[derive(Serialize)]
+struct VerificationInput<'a> {
+    claim: &'a str,
+    evidence: Vec<&'a str>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct VerificationResult {
+    pub label: String,
+    pub confidence: f64,
+}
+
+
+#[derive(Deserialize, Debug)]
+struct VerificationResponse {
+    results: Vec<VerificationResult>,
+}
+
+
+// --------------------------------------------------
+// Load SciFact documents
+// --------------------------------------------------
+
 fn load_documents() -> Vec<Document> {
-    let file = File::open("data/normalized/scifact/documents.jsonl")
-        .expect("Could not open documents");
+    let file = File::open(
+        "data/normalized/scifact/documents.jsonl"
+    )
+    .expect("Could not open documents");
 
     BufReader::new(file)
         .lines()
@@ -32,14 +64,192 @@ fn load_documents() -> Vec<Document> {
         .collect()
 }
 
+
+// --------------------------------------------------
+// Batch verifier
+// --------------------------------------------------
+
+fn verify(
+    claim: &str,
+    evidence: Vec<&str>,
+) -> VerificationResponse {
+    let input = VerificationInput {
+        claim,
+        evidence,
+    };
+
+    let json =
+        serde_json::to_string(&input)
+            .expect("Could not create verifier JSON");
+
+    let mut child = Command::new("python")
+        .arg("verifier/verify.py")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("Could not start verifier");
+
+    child
+        .stdin
+        .as_mut()
+        .expect("Could not open verifier stdin")
+        .write_all(json.as_bytes())
+        .expect("Could not send input to verifier");
+
+    let output = child
+        .wait_with_output()
+        .expect("Verifier failed");
+
+    if !output.status.success() {
+        panic!(
+            "Verifier exited with error:\n{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    serde_json::from_slice(&output.stdout)
+        .expect("Could not parse verifier result")
+}
+
+
+#[derive(Parser)]
+#[command(name = "auditgate")]
+#[command(about = "Evidence-grounded claim auditing")]
+struct Args {
+    /// Claim to audit
+    claim: String,
+}
+
+// --------------------------------------------------
+// Main AuditGate pipeline
+// --------------------------------------------------
+
 fn main() {
     let documents = load_documents();
 
-    println!("Loaded {} documents.", documents.len());
-
-    evaluation::evaluate_overlap(&documents);
+    println!(
+        "Loaded {} documents.",
+        documents.len()
+    );
 
     let bm25 = bm25::BM25::new(documents);
 
-    evaluation::evaluate_bm25(&bm25);
+    let args = Args::parse();
+    let claim = args.claim;
+    
+    println!("\nCLAIM");
+    println!("{claim}");
+
+
+    // --------------------------------------------------
+    // Document retrieval
+    // --------------------------------------------------
+
+    let documents = bm25.search(&claim, 5);
+
+    println!("\nRETRIEVED DOCUMENTS");
+
+    for (rank, (document, score))
+        in documents.iter().enumerate()
+    {
+        println!(
+            "{}. {} | {:.3} | {}",
+            rank + 1,
+            document.document_id,
+            score,
+            document.title
+        );
+    }
+
+
+    // --------------------------------------------------
+    // Passage retrieval
+    // --------------------------------------------------
+
+    let passages =
+        bm25.search_passages(
+            &claim,
+            &documents,
+            5,
+        );
+    
+    let reranked =
+        reranker::rerank(&claim, &passages);
+
+    println!("\nRERANKED EVIDENCE");
+
+    for (rank, item) in reranked.iter().enumerate() {
+        println!("\n--------------------------------");
+
+        println!(
+            "{}. relevance={:.3}",
+            rank + 1,
+            item.relevance_score
+        );
+
+        println!(
+            "Document: {}",
+            item.candidate.document.title
+        );
+
+        println!("{}", item.candidate.passage.text);
 }
+
+    let evidence: Vec<&str> = passages
+        .iter()
+        .map(|candidate| candidate.passage.text.as_str())
+        .collect();
+
+
+    // --------------------------------------------------
+    // Batch verification
+    // --------------------------------------------------
+
+    let verification =
+        verify(&claim, evidence);
+
+
+    // --------------------------------------------------
+    // Display evidence + verification
+    // --------------------------------------------------
+
+    println!("\nEVIDENCE VERIFICATION");
+
+for (index, (candidate, result)) in passages
+    .iter()
+    .zip(verification.results.iter())
+    .enumerate()
+{
+    println!("\n--------------------------------");
+
+    println!("{}. {}", index + 1, candidate.document.document_id);
+    println!("Document: {}", candidate.document.title);
+
+    println!(
+        "Scores: document={:.3} passage={:.3} combined={:.3}",
+        candidate.document_score,
+        candidate.passage_score,
+        candidate.combined_score
+    );
+
+    println!("{}", candidate.passage.text);
+
+    println!(
+        "→ {} ({:.3})",
+        result.label,
+        result.confidence
+    );
+}
+
+    let audit_decision =
+    decision::decide(&verification.results);
+
+println!("\n================================");
+println!("AUDITGATE DECISION");
+println!("================================");
+
+println!("Decision: {}", audit_decision.decision);
+println!("Reason: {}", audit_decision.reason);
+
+}
+
