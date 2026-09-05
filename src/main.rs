@@ -1,7 +1,8 @@
+mod alignment;
 mod bm25;
 mod decision;
 mod reranker;
-
+mod tacer;
 
 use clap::Parser;
 use serde::{Deserialize, Serialize};
@@ -21,7 +22,6 @@ struct Document {
     passages: Vec<Passage>,
 }
 
-
 // --------------------------------------------------
 // Verifier data structures
 // --------------------------------------------------
@@ -38,12 +38,10 @@ pub struct VerificationResult {
     pub confidence: f64,
 }
 
-
 #[derive(Deserialize, Debug)]
 struct VerificationResponse {
     results: Vec<VerificationResult>,
 }
-
 
 // --------------------------------------------------
 // Load SciFact documents
@@ -63,7 +61,6 @@ fn load_documents() -> Vec<Document> {
         })
         .collect()
 }
-
 
 // --------------------------------------------------
 // Batch verifier
@@ -111,6 +108,9 @@ fn verify(
         .expect("Could not parse verifier result")
 }
 
+// --------------------------------------------------
+// CLI
+// --------------------------------------------------
 
 #[derive(Parser)]
 #[command(name = "auditgate")]
@@ -136,10 +136,9 @@ fn main() {
 
     let args = Args::parse();
     let claim = args.claim;
-    
+
     println!("\nCLAIM");
     println!("{claim}");
-
 
     // --------------------------------------------------
     // Document retrieval
@@ -161,7 +160,6 @@ fn main() {
         );
     }
 
-
     // --------------------------------------------------
     // Passage retrieval
     // --------------------------------------------------
@@ -172,7 +170,11 @@ fn main() {
             &documents,
             5,
         );
-    
+
+    // --------------------------------------------------
+    // Semantic reranking
+    // --------------------------------------------------
+
     let reranked =
         reranker::rerank(&claim, &passages);
 
@@ -192,14 +194,200 @@ fn main() {
             item.candidate.document.title
         );
 
-        println!("{}", item.candidate.passage.text);
-}
+        println!(
+            "{}",
+            item.candidate.passage.text
+        );
+    }
+
+    // --------------------------------------------------
+    // TACER diagnostics
+    // --------------------------------------------------
+    //
+    // TACER is diagnostic only at this stage.
+    // It observes the reranked candidate evidence but
+    // does NOT yet alter verification or AuditGate's
+    // final decision.
+    // --------------------------------------------------
+
+    let retrieval_scores: Vec<f64> = reranked
+        .iter()
+        .map(|item| item.relevance_score)
+        .collect();
+
+    let retrieval_state =
+        tacer::retrieval_signals(&retrieval_scores);
+
+    println!("\n================================");
+    println!("TACER EVIDENCE STATE");
+    println!("================================");
+
+    println!("\nRETRIEVAL CONCENTRATION");
+
+    println!(
+        "Top score:          {:.3}",
+        retrieval_state.top_score
+    );
+
+    println!(
+        "Mean score:         {:.3}",
+        retrieval_state.mean_score
+    );
+
+    println!(
+        "Score std:          {:.3}",
+        retrieval_state.score_std
+    );
+
+    println!(
+        "Gap 1→2:            {:.3}",
+        retrieval_state.gap_1_2
+    );
+
+    println!(
+        "Gap 1→5:            {:.3}",
+        retrieval_state.gap_1_5
+    );
+
+    println!(
+        "Top-1 mass:         {:.3}",
+        retrieval_state.top1_mass
+    );
+
+    println!(
+        "Top-3 mass:         {:.3}",
+        retrieval_state.top3_mass
+    );
+
+    println!(
+        "Top-5 mass:         {:.3}",
+        retrieval_state.top5_mass
+    );
+
+    println!(
+        "Top1 / Top5:        {:.3}",
+        retrieval_state.top1_to_top5
+    );
+
+    println!(
+        "Top3 / Top8 mass:   {:.3}",
+        retrieval_state.top3_to_top8
+    );
+
+    println!(
+        "Entropy:            {:.3}",
+        retrieval_state.entropy
+    );
+
+    println!(
+        "Normalized entropy: {:.3}",
+        retrieval_state.normalized_entropy
+    );
+
+    // --------------------------------------------------
+    // TACER evidence coverage
+    // --------------------------------------------------
+
+    println!("\nEVIDENCE COVERAGE");
+
+    for (index, item) in reranked.iter().enumerate() {
+        let coverage = tacer::coverage_signals(
+            &claim,
+            &item.candidate.passage.text,
+            index,
+        );
+        let alignment = alignment::alignment_signals(
+            &claim,
+            &item.candidate.passage.text,
+        );
+
+        println!("\n--------------------------------");
+
+        println!(
+            "{}. {}",
+            index + 1,
+            item.candidate.document.document_id
+        );
+
+        println!(
+            "Document: {}",
+            item.candidate.document.title
+        );
+
+        println!(
+            "Exact overlap:  {:.3}",
+            coverage.exact_overlap
+        );
+
+        println!(
+            "Rare overlap:   {:.3}",
+            coverage.rare_overlap
+        );
+
+        println!(
+            "Phrase overlap: {:.3}",
+            coverage.phrase_overlap
+        );
+
+        println!(
+            "Density:        {:.3}",
+            coverage.density
+        );
+
+        println!(
+            "Position bonus: {:.3}",
+            coverage.position_bonus
+        );
+
+        println!(
+            "TACER score:    {:.3}",
+            coverage.evidence_score
+        );
+        println!(
+            "Anchor coverage: {:.3}",
+            alignment.anchor_coverage
+        );
+
+        println!(
+            "Entity coverage: {:.3}",
+            alignment.entity_coverage
+        );
+
+        println!(
+            "Primary anchor:  {}",
+            if alignment.primary_anchor_present {
+                "present"
+            } else {
+                "MISSING"
+            }
+        );
+
+        println!(
+            "Alignment score: {:.3}",
+            alignment.alignment_score
+        );
+        println!(
+            "{}",
+            item.candidate.passage.text
+        );
+    }
+
+    // --------------------------------------------------
+    // Evidence currently passed to verifier
+    // --------------------------------------------------
+    //
+    // IMPORTANT:
+    // We deliberately preserve the existing behavior
+    // for this experiment. TACER is not controlling
+    // evidence selection yet.
+    // --------------------------------------------------
 
     let evidence: Vec<&str> = passages
         .iter()
-        .map(|candidate| candidate.passage.text.as_str())
+        .map(|candidate| {
+            candidate.passage.text.as_str()
+        })
         .collect();
-
 
     // --------------------------------------------------
     // Batch verification
@@ -208,48 +396,67 @@ fn main() {
     let verification =
         verify(&claim, evidence);
 
-
     // --------------------------------------------------
     // Display evidence + verification
     // --------------------------------------------------
 
     println!("\nEVIDENCE VERIFICATION");
 
-for (index, (candidate, result)) in passages
-    .iter()
-    .zip(verification.results.iter())
-    .enumerate()
-{
-    println!("\n--------------------------------");
+    for (index, (candidate, result)) in passages
+        .iter()
+        .zip(verification.results.iter())
+        .enumerate()
+    {
+        println!("\n--------------------------------");
 
-    println!("{}. {}", index + 1, candidate.document.document_id);
-    println!("Document: {}", candidate.document.title);
+        println!(
+            "{}. {}",
+            index + 1,
+            candidate.document.document_id
+        );
 
-    println!(
-        "Scores: document={:.3} passage={:.3} combined={:.3}",
-        candidate.document_score,
-        candidate.passage_score,
-        candidate.combined_score
-    );
+        println!(
+            "Document: {}",
+            candidate.document.title
+        );
 
-    println!("{}", candidate.passage.text);
+        println!(
+            "Scores: document={:.3} passage={:.3} combined={:.3}",
+            candidate.document_score,
+            candidate.passage_score,
+            candidate.combined_score
+        );
 
-    println!(
-        "→ {} ({:.3})",
-        result.label,
-        result.confidence
-    );
-}
+        println!(
+            "{}",
+            candidate.passage.text
+        );
+
+        println!(
+            "→ {} ({:.3})",
+            result.label,
+            result.confidence
+        );
+    }
+
+    // --------------------------------------------------
+    // AuditGate decision
+    // --------------------------------------------------
 
     let audit_decision =
-    decision::decide(&verification.results);
+        decision::decide(&verification.results);
 
-println!("\n================================");
-println!("AUDITGATE DECISION");
-println!("================================");
+    println!("\n================================");
+    println!("AUDITGATE DECISION");
+    println!("================================");
 
-println!("Decision: {}", audit_decision.decision);
-println!("Reason: {}", audit_decision.reason);
+    println!(
+        "Decision: {}",
+        audit_decision.decision
+    );
 
+    println!(
+        "Reason: {}",
+        audit_decision.reason
+    );
 }
-

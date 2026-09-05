@@ -1,0 +1,95 @@
+Loading SciFact...
+Claims: 300
+Documents: 5183
+Building BM25 index...
+Loading MS-MARCO reranker...
+Loading AuditGate alignment model...
+Evaluated 20 claims...
+Evaluated 40 claims...
+Evaluated 60 claims...
+Evaluated 80 claims...
+Evaluated 100 claims...
+Evaluated 120 claims...
+Evaluated 140 claims...
+Evaluated 160 claims...
+Evaluated 180 claims...
+
+============================================================
+PROPOSITION ALIGNMENT BENCHMARK
+============================================================
+
+Claims evaluated: 188
+
+BM25 passage ranking
+--------------------
+Recall@1: 0.346
+Recall@3: 0.511
+Recall@5: 0.596
+MRR:      0.462
+
+MS-MARCO cross-encoder
+----------------------
+Recall@1: 0.521
+Recall@3: 0.718
+Recall@5: 0.755
+MRR:      0.631
+
+AuditGate learned alignment
+---------------------------
+Recall@1: 0.574
+Recall@3: 0.739
+Recall@5: 0.793
+MRR:      0.666
+
+============================================================
+PAIRWISE COMPARISON
+============================================================
+Alignment wins: 45
+MS-MARCO wins:  29
+Ties:           114
+
+EXAMPLE ALIGNMENT WINS
+------------------------------------------------------------
+
+A total of 1,000 people in the UK are asymptomatic carriers of vCJD infection.
+MS-MARCO rank: 12
+Alignment rank: 4
+
+ALDH1 expression is associated with better breast cancer outcomes.
+MS-MARCO rank: 2
+Alignment rank: 1
+
+Asymptomatic visual impairment screening in elderly populations does not lead to improved vision.
+MS-MARCO rank: 2
+Alignment rank: 1
+
+Bariatric surgery has a positive impact on mental health.
+MS-MARCO rank: 7
+Alignment rank: 2
+
+Basophils counteract disease development in patients with systemic lupus erythematosus (SLE).
+MS-MARCO rank: 3
+Alignment rank: 1
+
+EXAMPLE MS-MARCO WINS
+------------------------------------------------------------
+
+1,000 genomes project enables mapping of genetic sequence variation consisting of rare variants with larger penetrance effects than common variants.
+MS-MARCO rank: 2
+Alignment rank: 11
+
+A high microerythrocyte count raises vulnerability to severe anemia in homozygous alpha (+)- thalassemia trait subjects.
+MS-MARCO rank: 1
+Alignment rank: 3
+
+Angiotensin converting enzyme inhibitors are associated with increased risk for functional renal insufficiency.
+MS-MARCO rank: 3
+Alignment rank: 5
+
+Articles published in open access format are less likely to be cited than traditional journals.
+MS-MARCO rank: 1
+Alignment rank: 3
+
+Cell autonomous sex determination in somatic cells does not occur in Galliformes.
+MS-MARCO rank: 1
+Alignment rank: 5
