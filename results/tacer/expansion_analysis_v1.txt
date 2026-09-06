@@ -1,0 +1,320 @@
+
+================================================================================
+TACER EXPANSION FAILURE ANALYSIS
+================================================================================
+
+Rescuable top-5 failures: 12
+
+================================================================================
+CASE 1
+================================================================================
+
+CLAIM:
+Bone marrow cells contribute to adult macrophage compartments.
+
+TACER P(sufficient): 0.013
+Expanded: YES
+
+Gold Alignment rank @20: 2
+Gold Alignment score:   -0.257
+
+GOLD EVIDENCE:
+We also found that after bone marrow transplantation, host macrophages retained the capacity to expand when the development of donor macrophages was compromised.
+
+Highest false rank:      1
+Highest false score:     0.464
+Gold - false margin:   -0.720
+
+TOP FALSE EVIDENCE:
+Furthermore, Ang-1 enhanced the ability of HSCs to become quiescent and induced adhesion to bone, resulting in protection of the HSC compartment from myelosuppressive stress.
+
+OUTCOME: RETRIEVAL RESCUE + RANKING PARTIAL SUCCESS
+
+================================================================================
+CASE 2
+================================================================================
+
+CLAIM:
+Chronic aerobic exercise alters endothelial function, improving vasodilating mechanisms mediated by NO.
+
+TACER P(sufficient): 0.768
+Expanded: NO
+
+Gold Alignment rank @20: 6
+Gold Alignment score:   0.561
+
+GOLD EVIDENCE:
+CONCLUSIONS These data indicate that exercise training enhances bradykinin-mediated relaxation of collateral-dependent LCx arterioles isolated after chronic coronary occlusion, most likely because of effects on ecNOS mRNA expression and increased production of NO.
+
+Highest false rank:      1
+Highest false score:     1.610
+Gold - false margin:   -1.050
+
+TOP FALSE EVIDENCE:
+We found that (1) expression of iNOS and eNOS mRNA in endothelial cells was increased by chronic exercise and (2) chronic exercise blunted phenylephrine-induced vascular responses, probably by increasing NO release via iNOS.
+
+OUTCOME: ROUTING MISS (TACER did not expand)
+
+================================================================================
+CASE 3
+================================================================================
+
+CLAIM:
+Epigenetic modulating agents (EMAs) modulate antitumor immune response in a cancer model system.
+
+TACER P(sufficient): 0.369
+Expanded: YES
+
+Gold Alignment rank @20: None
+
+Highest false rank:      1
+Highest false score:     1.803
+
+TOP FALSE EVIDENCE:
+Through type I IFN signaling, AZA increases the numbers of CD45+ immune cells and the percentage of active CD8+ T and natural killer (NK) cells in the tumor microenvironment, while reducing tumor burden and extending survival.
+
+OUTCOME: RETRIEVAL RESCUE + RANKING DILUTION
+
+================================================================================
+CASE 4
+================================================================================
+
+CLAIM:
+Glycolysis is one of the primary glycometabolic pathways in cells.
+
+TACER P(sufficient): 0.046
+Expanded: YES
+
+Gold Alignment rank @20: None
+
+Highest false rank:      1
+Highest false score:     0.275
+
+TOP FALSE EVIDENCE:
+This specifically localized glycolytic machinery may supply constant energy, independent of mitochondria, for the processive movement of vesicles over long distances in axons.
+
+OUTCOME: RETRIEVAL RESCUE + RANKING DILUTION
+
+================================================================================
+CASE 5
+================================================================================
+
+CLAIM:
+Ly6C hi monocytes have a lower inflammatory capacity than Ly6C lo monocytes.
+
+TACER P(sufficient): 0.353
+Expanded: YES
+
+Gold Alignment rank @20: 3
+Gold Alignment score:   -1.290
+
+GOLD EVIDENCE:
+Under inflammatory conditions elicited either by acute infection with Listeria monocytogenes or chronic infection with Leishmania major, there was a significant increase in immature Ly-6C(high) monocytes, resembling the inflammatory left shift of granulocytes.
+
+Highest false rank:      1
+Highest false score:     -0.403
+Gold - false margin:   -0.886
+
+TOP FALSE EVIDENCE:
+In the current study, we show that recruitment of significantly greater numbers of inflammatory subset of CD11b(+)F4/80(+)Ly6C+ monocytes to the inflammatory sites in KLF2 hemizygous mice compared to the wild type littermate controls.
+
+OUTCOME: RETRIEVAL RESCUE + RANKING PARTIAL SUCCESS
+
+================================================================================
+CASE 6
+================================================================================
+
+CLAIM:
+Many proteins in human cells can be post-translationally modified at lysine residues via acetylation.
+
+TACER P(sufficient): 0.756
+Expanded: NO
+
+Gold Alignment rank @20: 1
+Gold Alignment score:   0.794
+
+GOLD EVIDENCE:
+Lysine acetylation is a reversible posttranslational modifcation, an epigenetic phenomenon, referred to as transfer of an acetyl group from acetyl CoA to lysine e- amino group of targeted protein, which is modulated by acetyltransferases (histone/ lysine (K) acetyltransferases, HATs/KATs) and deacetylases (histone/lysine (K) deacetylases, HDACs/KDACs).
+
+Highest false rank:      2
+Highest false score:     0.610
+Gold - false margin:   +0.184
+
+TOP FALSE EVIDENCE:
+We detected more than 1,200 mature protein N-termini and could show that N-terminal acetylation occurs in insects with a similar frequency as in humans.
+
+OUTCOME: ROUTING MISS (TACER did not expand)
+
+================================================================================
+CASE 7
+================================================================================
+
+CLAIM:
+Rapid up-regulation and higher basal expression of interferon-induced genes increase survival of granule cell neurons that are infected by West Nile virus.
+
+TACER P(sufficient): 0.098
+Expanded: YES
+
+Gold Alignment rank @20: 3
+Gold Alignment score:   -1.470
+
+GOLD EVIDENCE:
+By transducing cortical neurons with genes that were expressed more highly in granule cell neurons, we identified three interferon-stimulated genes (ISGs; Ifi27, Irg1 and Rsad2 (also known as Viperin)) that mediated the antiviral effects against different neurotropic viruses.
+
+Highest false rank:      1
+Highest false score:     -1.203
+Gold - false margin:   -0.267
+
+TOP FALSE EVIDENCE:
+Moreover, we found that the epigenetic state and microRNA (miRNA)-mediated regulation of ISGs correlates with enhanced antiviral response in granule cell neurons.
+
+OUTCOME: RETRIEVAL RESCUE + RANKING PARTIAL SUCCESS
+
+================================================================================
+CASE 8
+================================================================================
+
+CLAIM:
+Rapid up-regulation and higher basal expression of interferon-induced genes reduce survival of granule cell neurons that are infected by West Nile virus.
+
+TACER P(sufficient): 0.115
+Expanded: YES
+
+Gold Alignment rank @20: 8
+Gold Alignment score:   -1.651
+
+GOLD EVIDENCE:
+By transducing cortical neurons with genes that were expressed more highly in granule cell neurons, we identified three interferon-stimulated genes (ISGs; Ifi27, Irg1 and Rsad2 (also known as Viperin)) that mediated the antiviral effects against different neurotropic viruses.
+
+Highest false rank:      1
+Highest false score:     -1.400
+Gold - false margin:   -0.251
+
+TOP FALSE EVIDENCE:
+B cells exposed to the knock-out virus displayed slower growth, and exhibited a two-fold reduction in the percentage of cells entering the cell cycle S phase.
+
+OUTCOME: RETRIEVAL RESCUE + RANKING DILUTION
+
+================================================================================
+CASE 9
+================================================================================
+
+CLAIM:
+TCR/CD3 microdomains are a required to induce the immunologic synapse to activate T cells.
+
+TACER P(sufficient): 0.627
+Expanded: NO
+
+Gold Alignment rank @20: 6
+Gold Alignment score:   0.437
+
+GOLD EVIDENCE:
+This conformational change at CD3 reverts upon ligand dissociation and is required for T cell activation.
+
+Highest false rank:      1
+Highest false score:     2.248
+Gold - false margin:   -1.810
+
+TOP FALSE EVIDENCE:
+Finally, by interfering with Nck-CD3 epsilon association in vivo, we demonstrate that TCR-CD3 recruitment of Nck is critical for maturation of the immune synapse and for T cell activation.
+
+OUTCOME: ROUTING MISS (TACER did not expand)
+
+================================================================================
+CASE 10
+================================================================================
+
+CLAIM:
+Taking 400mg of α-tocopheryl acetate helps to prevent prostate cancer.
+
+TACER P(sufficient): 0.011
+Expanded: YES
+
+Gold Alignment rank @20: 4
+Gold Alignment score:   -0.803
+
+GOLD EVIDENCE:
+Compared with placebo, vitamin E had no effect on the incidence of prostate cancer (active and placebo vitamin E groups, 9.1 and 9.5 events per 1000 person-years; hazard ratio [HR], 0.97; 95% confidence interval [CI], 0.85-1.09; P = .58) or total cancer (active and placebo vitamin E groups, 17.8 and 17.3 cases per 1000 person-years; HR, 1.04; 95% CI, 0.95-1.13; P = .41).
+
+Highest false rank:      1
+Highest false score:     -0.506
+Gold - false margin:   -0.297
+
+TOP FALSE EVIDENCE:
+In adjusted analyses, there was no association with 8 of the 10 additional cancers; ever use of pioglitazone was associated with increased risk of prostate cancer (HR, 1.13; 95% CI, 1.02-1.26) and pancreatic cancer (HR, 1.41; 95% CI, 1.16-1.71).
+
+OUTCOME: RETRIEVAL RESCUE + RANKING PARTIAL SUCCESS
+
+================================================================================
+CASE 11
+================================================================================
+
+CLAIM:
+Vitamin D deficiency effects the term of delivery.
+
+TACER P(sufficient): 0.439
+Expanded: YES
+
+Gold Alignment rank @20: 2
+Gold Alignment score:   1.642
+
+GOLD EVIDENCE:
+CONCLUSION Vitamin D insufficiency is associated with an increased risk of gestational diabetes, pre-eclampsia, and small for gestational age infants.
+
+Highest false rank:      1
+Highest false score:     2.007
+Gold - false margin:   -0.365
+
+TOP FALSE EVIDENCE:
+Thus, vitamin D action in a particular cell depends upon the metabolic production or delivery of sufficient concentrations of the 1,25D ligand, expression of adequate VDR and RXR coreceptor proteins, and cell-specific programming of transcriptional responses to regulate select genes that encode proteins that function in mediating the effects of vitamin D. For example, 1,25D induces RANKL, SPP1 (osteopontin), and BGP (osteocalcin) to govern bone mineral remodeling; TRPV6, CaBP9k, and claudin 2 to promote intestinal calcium absorption; and TRPV5, klotho, and Npt2c to regulate renal calcium and phosphate reabsorption.
+
+OUTCOME: RETRIEVAL RESCUE + RANKING PARTIAL SUCCESS
+
+================================================================================
+CASE 12
+================================================================================
+
+CLAIM:
+aPKCz causes tumour enhancement by affecting glutamine metabolism.
+
+TACER P(sufficient): 0.012
+Expanded: YES
+
+Gold Alignment rank @20: 1
+Gold Alignment score:   0.377
+
+GOLD EVIDENCE:
+Interestingly, the loss of PKCζ in mice results in enhanced intestinal tumorigenesis and increased levels of these two metabolic enzymes, whereas patients with low levels of PKCζ have a poor prognosis.
+
+Highest false rank:      2
+Highest false score:     -0.876
+Gold - false margin:   +1.253
+
+TOP FALSE EVIDENCE:
+We show that PKCζ deficiency promotes the plasticity necessary for cancer cells to reprogram their metabolism to utilize glutamine through the serine biosynthetic pathway in the absence of glucose.
+
+OUTCOME: FULL RESCUE (gold becomes rank 1)
+
+================================================================================
+SUMMARY
+================================================================================
+
+Rescuable failures:          12
+TACER expanded:              9/12
+
+GOLD ALIGNMENT RANK @20
+----------------------------------------
+1                  2
+2-3                4
+4-5                1
+6-10               3
+11-20              0
+>20 / missing      2
+
+Gold reaches R@1:            2/12
+Gold reaches R@3:            6/12
+Gold reaches R@5:            7/12
+
+Mean gold-vs-top-false margin: -0.421
+
+Summary saved to: results/tacer/expansion_analysis_v1.json
