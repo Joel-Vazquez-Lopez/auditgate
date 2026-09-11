@@ -90,6 +90,31 @@ impl BM25 {
         results
     }
 
+    pub fn all_passages<'a>(
+    &'a self,
+    documents: &[(&'a Document, f64)],
+) -> Vec<EvidenceCandidate<'a>> {
+    let mut candidates = Vec::new();
+
+    for (document, document_score) in documents {
+        for passage in &document.passages {
+            candidates.push(EvidenceCandidate {
+                document,
+                passage,
+                document_score: *document_score,
+
+                // These scores are not used by TACER-A here.
+                // MS-MARCO and Alignment V1 are computed by
+                // the Python inference bridge.
+                passage_score: 0.0,
+                combined_score: 0.0,
+            });
+        }
+    }
+
+    candidates
+}
+
     pub fn search_passages<'a>(
     &'a self,
     query: &str,

@@ -44,6 +44,38 @@ struct VerificationResponse {
 }
 
 // --------------------------------------------------
+// TACER-A runtime data structures
+// --------------------------------------------------
+
+#[derive(Serialize)]
+struct TacerCandidateInput<'a> {
+    document_id: &'a str,
+    passage_id: String,
+    text: &'a str,
+}
+
+#[derive(Serialize)]
+struct TacerInput<'a> {
+    claim: &'a str,
+    retrieved_document_scores: Vec<f64>,
+    candidates: Vec<TacerCandidateInput<'a>>,
+}
+
+#[derive(Deserialize, Debug)]
+struct TacerScoredCandidate {
+    document_id: String,
+    passage_id: String,
+    msmarco_score: f64,
+    alignment_score: f64,
+}
+
+#[derive(Deserialize, Debug)]
+struct TacerInferenceResponse {
+    probability_sufficient: f64,
+    candidates: Vec<TacerScoredCandidate>,
+}
+
+// --------------------------------------------------
 // Load SciFact documents
 // --------------------------------------------------
 
@@ -108,6 +140,67 @@ fn verify(
         .expect("Could not parse verifier result")
 }
 
+
+fn infer_tacer<'a>(
+    claim: &'a str,
+    documents: &[(&'a Document, f64)],
+    candidates: &[bm25::EvidenceCandidate<'a>],
+) -> TacerInferenceResponse {
+    let input = TacerInput {
+        claim,
+
+        retrieved_document_scores: documents
+            .iter()
+            .map(|(_, score)| *score)
+            .collect(),
+
+        candidates: candidates
+            .iter()
+            .enumerate()
+            .map(|(index, candidate)| TacerCandidateInput {
+                document_id:
+                    candidate.document.document_id.as_str(),
+
+                passage_id:
+                    format!("runtime:{index}"),
+
+                text:
+                    candidate.passage.text.as_str(),
+            })
+            .collect(),
+    };
+
+    let json = serde_json::to_string(&input)
+        .expect("Could not create TACER JSON");
+
+    let mut child = Command::new("python")
+        .arg("src/tacer/infer.py")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("Could not start TACER inference");
+
+    child
+        .stdin
+        .as_mut()
+        .expect("Could not open TACER stdin")
+        .write_all(json.as_bytes())
+        .expect("Could not send TACER input");
+
+    let output = child
+        .wait_with_output()
+        .expect("TACER inference failed");
+
+    if !output.status.success() {
+        panic!(
+            "TACER inference exited with error:\n{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    serde_json::from_slice(&output.stdout)
+        .expect("Could not parse TACER result")
+}
 // --------------------------------------------------
 // CLI
 // --------------------------------------------------
@@ -170,6 +263,44 @@ fn main() {
             &documents,
             5,
         );
+
+    // --------------------------------------------------
+    // Learned TACER-A inference
+    // --------------------------------------------------
+
+    let tacer_candidates =
+        bm25.all_passages(&documents);
+
+    let tacer_inference =
+        infer_tacer(
+            &claim,
+            &documents,
+            &tacer_candidates,
+        );
+
+    println!("\n================================");
+    println!("TACER-A");
+    println!("================================");
+
+    println!(
+        "P(sufficient): {:.6}",
+        tacer_inference.probability_sufficient
+    );
+
+    let tacer_route =
+        tacer::route_initial(
+            tacer_inference.probability_sufficient
+        );
+
+    println!(
+        "Route: {:?}",
+        tacer_route
+    );
+
+    println!(
+        "Candidates evaluated: {}",
+        tacer_inference.candidates.len()
+    );
 
     // --------------------------------------------------
     // Semantic reranking
