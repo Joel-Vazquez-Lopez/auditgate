@@ -1,0 +1,153 @@
+Loading SciFact dev...
+Supervised claims: 188
+Building document BM25 index...
+Loading MS-MARCO...
+Loading Alignment V1...
+Loading frozen TACER...
+Loading SciFact verifier...
+Evaluated 20 claims...
+Evaluated 40 claims...
+Evaluated 60 claims...
+Evaluated 80 claims...
+Evaluated 100 claims...
+Evaluated 120 claims...
+Evaluated 140 claims...
+Evaluated 160 claims...
+Evaluated 180 claims...
+
+==========================================================================================
+TACER ADAPTIVE RETRIEVAL — SCIFACT DEV
+==========================================================================================
+
+Claims evaluated: 188
+Frozen threshold: 0.55
+
+STRATEGY              CAND.R       R@1       R@3       R@5    AVG DOCS
+----------------------------------------------------------------------
+Fixed-5                0.883     0.559     0.729     0.782        5.00
+Fixed-10               0.926     0.532     0.723     0.739       10.00
+Fixed-20               0.947     0.511     0.691     0.729       20.00
+Random-budget          0.910     0.553     0.718     0.771        9.31
+TACER 5→20             0.931     0.537     0.713     0.750        9.31
+Selective-3            0.862     0.537     0.713     0.761        9.31
+Selective-5            0.872     0.537     0.713     0.750        9.31
+
+==========================================================================================
+TACER ROUTING
+==========================================================================================
+Expanded claims:             54/188 (28.7%)
+Average documents:           9.31
+Average candidate passages:  84.46
+
+SELECTIVE MERGE
+----------------------------------------
+Selective-3 final passages:  36.09
+Selective-5 final passages:  36.66
+
+Top-5 retrieval failures:    22
+Failures detected:           19/22 (86.4%)
+Top-5 retrieval successes:   166
+Unnecessary expansions:      35/166 (21.1%)
+
+Failures rescuable @20:      12
+Rescuable failures expanded: 9/12 (75.0%)
+
+==================================================================================
+END-TO-END TACER-A INTERVENTION
+==================================================================================
+
+BASELINE WRONG COMMITMENTS
+--------------------------------------------------
+Wrong → Correct:  0
+Wrong → Review:   1
+Wrong → Wrong:    5
+
+BASELINE CORRECT COMMITMENTS
+--------------------------------------------------
+Correct → Correct: 78
+Correct → Review:  8
+Correct → Wrong:   0
+
+BASELINE REVIEWS
+--------------------------------------------------
+Review → Correct: 4
+Review → Wrong:   1
+Review → Review:  91
+
+==================================================================================
+KEY FAILURE CASES
+==================================================================================
+
+----------------------------------------------------------------------------------
+scifact:183
+TACER P(sufficient): 0.013
+Expanded:             True
+Baseline decision:    ALLOW
+Adaptive decision:    ALLOW
+Gold:                 contradicted
+Gold candidate @5:    0
+Gold candidate @20:   1
+Gold top-5 @5:        0
+Gold top-5 @20:       1
+
+----------------------------------------------------------------------------------
+scifact:759
+TACER P(sufficient): 0.982
+Expanded:             False
+Baseline decision:    ALLOW
+Adaptive decision:    ALLOW
+Gold:                 contradicted
+Gold candidate @5:    1
+Gold candidate @20:   1
+Gold top-5 @5:        1
+Gold top-5 @20:       0
+
+----------------------------------------------------------------------------------
+scifact:859
+TACER P(sufficient): 0.472
+Expanded:             True
+Baseline decision:    ALLOW
+Adaptive decision:    ALLOW
+Gold:                 contradicted
+Gold candidate @5:    1
+Gold candidate @20:   1
+Gold top-5 @5:        1
+Gold top-5 @20:       1
+
+----------------------------------------------------------------------------------
+scifact:1140
+TACER P(sufficient): 0.011
+Expanded:             True
+Baseline decision:    ALLOW
+Adaptive decision:    REVIEW
+Gold:                 contradicted
+Gold candidate @5:    0
+Gold candidate @20:   1
+Gold top-5 @5:        0
+Gold top-5 @20:       1
+
+----------------------------------------------------------------------------------
+scifact:1221
+TACER P(sufficient): 0.037
+Expanded:             True
+Baseline decision:    ALLOW
+Adaptive decision:    ALLOW
+Gold:                 contradicted
+Gold candidate @5:    0
+Gold candidate @20:   0
+Gold top-5 @5:        0
+Gold top-5 @20:       0
+
+----------------------------------------------------------------------------------
+scifact:1290
+TACER P(sufficient): 0.996
+Expanded:             False
+Baseline decision:    BLOCK
+Adaptive decision:    BLOCK
+Gold:                 supported
+Gold candidate @5:    1
+Gold candidate @20:   1
+Gold top-5 @5:        1
+Gold top-5 @20:       1
+
+Detailed results saved to: results/tacer/adaptive_v1_scifact_dev.json

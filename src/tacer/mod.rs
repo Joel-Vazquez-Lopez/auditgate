@@ -2,6 +2,7 @@ pub mod coverage;
 pub mod features;
 pub mod router;
 pub mod types;
+pub mod controller;
 
 pub use coverage::{
     coverage_signals,
@@ -21,3 +22,5 @@ pub use types::{
     RetrievalSignals,
     TacerDecision,
 };
+
+pub use controller::choose_action;

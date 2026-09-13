@@ -1,0 +1,75 @@
+
+==============================================================================
+TACER-B VERIFIER RISK-COVERAGE — SCIFACT DEV
+==============================================================================
+
+ THRESH    COVERAGE   COMMIT   CORRECT   WRONG      RISK   REVIEW
+------------------------------------------------------------------------------
+   0.50       0.457       86        82       4     0.047      102
+   0.55       0.457       86        82       4     0.047      102
+   0.60       0.457       86        82       4     0.047      102
+   0.65       0.463       87        83       4     0.046      101
+   0.70       0.468       88        83       5     0.057      100
+   0.75       0.468       88        83       5     0.057      100
+   0.80       0.468       88        83       5     0.057      100
+   0.85       0.479       90        84       6     0.067       98
+   0.90       0.489       92        86       6     0.065       96
+   0.95       0.505       95        89       6     0.063       93
+
+==============================================================================
+WRONG COMMITMENTS AT THRESHOLD 0.90
+==============================================================================
+
+------------------------------------------------------------------------------
+Claim ID: scifact:183
+Gold:     contradicted
+Decision: ALLOW
+Support:  1.000
+Contrad.: 0.696
+
+Bone marrow cells contribute to adult macrophage compartments.
+
+------------------------------------------------------------------------------
+Claim ID: scifact:759
+Gold:     contradicted
+Decision: ALLOW
+Support:  1.000
+Contrad.: 0.006
+
+Mathematical models predict that using Artemisinin-based combination therapy over nongametocytocidal drugs have a dramatic impact in reducing malaria transmission.
+
+------------------------------------------------------------------------------
+Claim ID: scifact:859
+Gold:     contradicted
+Decision: ALLOW
+Support:  1.000
+Contrad.: 0.002
+
+Normal expression of RUNX1 has tumor-promoting effects.
+
+------------------------------------------------------------------------------
+Claim ID: scifact:1140
+Gold:     contradicted
+Decision: ALLOW
+Support:  0.999
+Contrad.: 0.828
+
+Taking 400mg of α-tocopheryl acetate helps to prevent prostate cancer.
+
+------------------------------------------------------------------------------
+Claim ID: scifact:1221
+Gold:     contradicted
+Decision: ALLOW
+Support:  1.000
+Contrad.: 0.001
+
+The genomic aberrations found in matasteses are very similar to those found in the primary tumor.
+
+------------------------------------------------------------------------------
+Claim ID: scifact:1290
+Gold:     supported
+Decision: BLOCK
+Support:  0.143
+Contrad.: 0.999
+
+There is an inverse relationship between hip fractures and statin use.

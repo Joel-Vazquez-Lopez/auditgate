@@ -1,0 +1,93 @@
+{
+  "counts": {
+    "claims": 188,
+    "expanded": 54,
+    "lost_candidate_s3": 13,
+    "lost_candidate_s5": 11,
+    "gold_below_logged_top10": 5,
+    "gold_below_initial_top5": 4,
+    "selective_3_top1_improved": 0,
+    "selective_3_top1_harmed": 0,
+    "selective_3_top1_unchanged": 188,
+    "selective_5_top1_improved": 0,
+    "selective_5_top1_harmed": 0,
+    "selective_5_top1_unchanged": 188,
+    "selective_3_top3_improved": 0,
+    "selective_3_top3_harmed": 0,
+    "selective_3_top3_unchanged": 188,
+    "selective_5_top3_improved": 0,
+    "selective_5_top3_harmed": 0,
+    "selective_5_top3_unchanged": 188,
+    "selective_3_top5_improved": 3,
+    "selective_3_top5_harmed": 1,
+    "selective_3_top5_unchanged": 184,
+    "selective_5_top5_improved": 0,
+    "selective_5_top5_harmed": 0,
+    "selective_5_top5_unchanged": 188
+  },
+  "lost_cases": [
+    {
+      "claim_id": "scifact:3",
+      "claim": "1,000 genomes project enables mapping of genetic sequence variation consisting of rare variants with larger penetrance effects than common variants.",
+      "gold_rank_initial": null,
+      "reason": "gold_below_logged_top10",
+      "probability_sufficient": 0.10970449573684704
+    },
+    {
+      "claim_id": "scifact:513",
+      "claim": "High cardiopulmonary fitness causes increased mortality rate.",
+      "gold_rank_initial": 10,
+      "reason": "gold_below_initial_top5",
+      "probability_sufficient": 0.5155990614131816
+    },
+    {
+      "claim_id": "scifact:540",
+      "claim": "Hypothalamic glutamate neurotransmission is crucial to energy balance.",
+      "gold_rank_initial": null,
+      "reason": "gold_below_logged_top10",
+      "probability_sufficient": 0.5238811274941995
+    },
+    {
+      "claim_id": "scifact:718",
+      "claim": "Low nucleosome occupancy correlates with low methylation levels across species.",
+      "gold_rank_initial": 9,
+      "reason": "gold_below_initial_top5",
+      "probability_sufficient": 0.11393313622383254
+    },
+    {
+      "claim_id": "scifact:743",
+      "claim": "Macrolides protect against myocardial infarction.",
+      "gold_rank_initial": null,
+      "reason": "gold_below_logged_top10",
+      "probability_sufficient": 0.395173303725376
+    },
+    {
+      "claim_id": "scifact:793",
+      "claim": "Mitochondria are uninvolved in apoptosis.",
+      "gold_rank_initial": null,
+      "reason": "gold_below_logged_top10",
+      "probability_sufficient": 0.003180745875181292
+    },
+    {
+      "claim_id": "scifact:1019",
+      "claim": "Rapid phosphotransfer rates govern fidelity in two component systems",
+      "gold_rank_initial": null,
+      "reason": "gold_below_logged_top10",
+      "probability_sufficient": 0.18042859520905044
+    },
+    {
+      "claim_id": "scifact:1150",
+      "claim": "Tetraspanin-3 is a causative factor in the development of acute myelogenous leukemia",
+      "gold_rank_initial": 6,
+      "reason": "gold_below_initial_top5",
+      "probability_sufficient": 0.1711659951883853
+    },
+    {
+      "claim_id": "scifact:1320",
+      "claim": "Transplanted human glial progenitor cells are incapable of forming a neural network with host animals' neurons.",
+      "gold_rank_initial": 9,
+      "reason": "gold_below_initial_top5",
+      "probability_sufficient": 0.27826777736077424
+    }
+  ]
+}

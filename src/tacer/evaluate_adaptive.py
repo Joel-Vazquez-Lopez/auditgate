@@ -1,7 +1,14 @@
 import json
 import pickle
 import random
+import torch
 from pathlib import Path
+
+
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+)
 
 import numpy as np
 from rank_bm25 import BM25Okapi
@@ -36,6 +43,12 @@ TACER_MODEL = Path(
 MSMARCO_MODEL = (
     "cross-encoder/ms-marco-MiniLM-L-6-v2"
 )
+
+VERIFIER_MODEL = Path(
+    "models/scifact-verifier"
+)
+
+VERIFIER_THRESHOLD = 0.90
 
 TACER_THRESHOLD = 0.55
 
@@ -369,6 +382,23 @@ if tacer_features != FEATURE_NAMES:
         "TACER feature order does not match evaluator."
     )
 
+print("Loading SciFact verifier...")
+
+verifier_tokenizer = (
+    AutoTokenizer.from_pretrained(
+        str(VERIFIER_MODEL)
+    )
+)
+
+verifier = (
+    AutoModelForSequenceClassification
+    .from_pretrained(
+        str(VERIFIER_MODEL)
+    )
+)
+
+verifier.eval()
+
 # --------------------------------------------------
 # Storage
 # --------------------------------------------------
@@ -380,7 +410,106 @@ fixed_results = {
     for depth in DEPTHS
 }
 
+def verify_candidates(
+    claim_text,
+    candidates,
+):
+    ranked = sorted(
+        candidates,
+        key=lambda candidate:
+            candidate["alignment_score"],
+        reverse=True,
+    )[:5]
 
+    if not ranked:
+        return {
+            "decision": "REVIEW",
+            "max_support": 0.0,
+            "max_contradiction": 0.0,
+        }
+
+    evidence_texts = [
+        candidate["text"]
+        for candidate in ranked
+    ]
+
+    claim_texts = [
+        claim_text
+    ] * len(evidence_texts)
+
+    inputs = verifier_tokenizer(
+        evidence_texts,
+        claim_texts,
+        return_tensors="pt",
+        truncation=True,
+        padding=True,
+        max_length=512,
+    )
+
+    with torch.no_grad():
+        logits = verifier(
+            **inputs
+        ).logits
+
+        probabilities = torch.softmax(
+            logits,
+            dim=1,
+        )
+
+    support_scores = (
+        probabilities[:, 0]
+        .detach()
+        .cpu()
+        .tolist()
+    )
+
+    contradiction_scores = (
+        probabilities[:, 1]
+        .detach()
+        .cpu()
+        .tolist()
+    )
+
+    max_support = max(
+        support_scores,
+        default=0.0,
+    )
+
+    max_contradiction = max(
+        contradiction_scores,
+        default=0.0,
+    )
+
+    strong_support = (
+        max_support >= VERIFIER_THRESHOLD
+    )
+
+    strong_contradiction = (
+        max_contradiction
+        >= VERIFIER_THRESHOLD
+    )
+
+    if (
+        strong_support
+        and not strong_contradiction
+    ):
+        decision = "ALLOW"
+
+    elif (
+        strong_contradiction
+        and not strong_support
+    ):
+        decision = "BLOCK"
+
+    else:
+        decision = "REVIEW"
+
+    return {
+        "decision": decision,
+        "max_support": max_support,
+        "max_contradiction":
+            max_contradiction,
+    }
 # --------------------------------------------------
 # Evaluate each claim
 # --------------------------------------------------
@@ -586,6 +715,28 @@ for claim_index, claim in enumerate(
         else 5
     )
 
+    # --------------------------------------------------
+    # End-to-end verification experiment
+    # --------------------------------------------------
+    #
+    # Baseline:
+    # always verify evidence from depth 5.
+    #
+    # Adaptive:
+    # verify evidence from the depth selected by TACER-A.
+    # --------------------------------------------------
+
+    baseline_verification = verify_candidates(
+        claim_text,
+        depth_data[5]["candidates"],
+    )
+
+    adaptive_verification = verify_candidates(
+        claim_text,
+        depth_data[
+            final_depth
+        ]["candidates"],
+    )
         # --------------------------------------------------
     # Selective expansion strategies
     # --------------------------------------------------
@@ -672,6 +823,15 @@ for claim_index, claim in enumerate(
             depth_data[
                 20
             ]["evaluation"],
+
+                "baseline_verification":
+            baseline_verification,
+
+        "adaptive_verification":
+            adaptive_verification,
+
+        "gold_label":
+            claim["gold_label"],
 
         "adaptive":
             depth_data[
@@ -761,6 +921,22 @@ for claim_index, claim in enumerate(
 # --------------------------------------------------
 # Metric helpers
 # --------------------------------------------------
+
+def verification_correct(
+    gold_label,
+    decision,
+):
+    return (
+        (
+            gold_label == "supported"
+            and decision == "ALLOW"
+        )
+        or
+        (
+            gold_label == "contradicted"
+            and decision == "BLOCK"
+        )
+    )
 
 def summarize(
     evaluations,
@@ -1159,6 +1335,248 @@ if rescuable_failures:
         f")"
     )
 
+# --------------------------------------------------
+# End-to-end TACER-A intervention analysis
+# --------------------------------------------------
+
+transitions = {
+    "wrong_to_correct": 0,
+    "wrong_to_review": 0,
+    "wrong_to_wrong": 0,
+    "correct_to_correct": 0,
+    "correct_to_review": 0,
+    "correct_to_wrong": 0,
+    "review_to_correct": 0,
+    "review_to_wrong": 0,
+    "review_to_review": 0,
+}
+
+
+for row in claim_results:
+
+    gold = row["gold_label"]
+
+    baseline = row[
+        "baseline_verification"
+    ]["decision"]
+
+    adaptive = row[
+        "adaptive_verification"
+    ]["decision"]
+
+    baseline_correct = (
+        verification_correct(
+            gold,
+            baseline,
+        )
+    )
+
+    adaptive_correct = (
+        verification_correct(
+            gold,
+            adaptive,
+        )
+    )
+
+    if baseline == "REVIEW":
+
+        if adaptive == "REVIEW":
+            transitions[
+                "review_to_review"
+            ] += 1
+
+        elif adaptive_correct:
+            transitions[
+                "review_to_correct"
+            ] += 1
+
+        else:
+            transitions[
+                "review_to_wrong"
+            ] += 1
+
+    elif baseline_correct:
+
+        if adaptive == "REVIEW":
+            transitions[
+                "correct_to_review"
+            ] += 1
+
+        elif adaptive_correct:
+            transitions[
+                "correct_to_correct"
+            ] += 1
+
+        else:
+            transitions[
+                "correct_to_wrong"
+            ] += 1
+
+    else:
+
+        if adaptive == "REVIEW":
+            transitions[
+                "wrong_to_review"
+            ] += 1
+
+        elif adaptive_correct:
+            transitions[
+                "wrong_to_correct"
+            ] += 1
+
+        else:
+            transitions[
+                "wrong_to_wrong"
+            ] += 1
+
+
+print()
+print("=" * 82)
+print(
+    "END-TO-END TACER-A INTERVENTION"
+)
+print("=" * 82)
+
+print()
+print("BASELINE WRONG COMMITMENTS")
+print("-" * 50)
+
+print(
+    "Wrong → Correct: ",
+    transitions["wrong_to_correct"],
+)
+
+print(
+    "Wrong → Review:  ",
+    transitions["wrong_to_review"],
+)
+
+print(
+    "Wrong → Wrong:   ",
+    transitions["wrong_to_wrong"],
+)
+
+
+print()
+print("BASELINE CORRECT COMMITMENTS")
+print("-" * 50)
+
+print(
+    "Correct → Correct:",
+    transitions["correct_to_correct"],
+)
+
+print(
+    "Correct → Review: ",
+    transitions["correct_to_review"],
+)
+
+print(
+    "Correct → Wrong:  ",
+    transitions["correct_to_wrong"],
+)
+
+
+print()
+print("BASELINE REVIEWS")
+print("-" * 50)
+
+print(
+    "Review → Correct:",
+    transitions["review_to_correct"],
+)
+
+print(
+    "Review → Wrong:  ",
+    transitions["review_to_wrong"],
+)
+
+print(
+    "Review → Review: ",
+    transitions["review_to_review"],
+)
+
+
+# --------------------------------------------------
+# Key failure cases
+# --------------------------------------------------
+
+KEY_CASES = {
+    "scifact:183",
+    "scifact:759",
+    "scifact:859",
+    "scifact:1140",
+    "scifact:1221",
+    "scifact:1290",
+}
+
+print()
+print("=" * 82)
+print("KEY FAILURE CASES")
+print("=" * 82)
+
+for row in claim_results:
+
+    if row["claim_id"] not in KEY_CASES:
+        continue
+
+    print()
+    print("-" * 82)
+
+    print(row["claim_id"])
+
+    print(
+        "TACER P(sufficient): "
+        f"{row['probability_sufficient']:.3f}"
+    )
+
+    print(
+        "Expanded:            ",
+        row["expanded"],
+    )
+
+    print(
+        "Baseline decision:   ",
+        row[
+            "baseline_verification"
+        ]["decision"],
+    )
+
+    print(
+        "Adaptive decision:   ",
+        row[
+            "adaptive_verification"
+        ]["decision"],
+    )
+
+    print(
+        "Gold:                ",
+        row["gold_label"],
+    )
+
+    print(
+        "Gold candidate @5:   ",
+        row["fixed_5"][
+            "candidate_success"
+        ],
+    )
+
+    print(
+        "Gold candidate @20:  ",
+        row["fixed_20"][
+            "candidate_success"
+        ],
+    )
+
+    print(
+        "Gold top-5 @5:       ",
+        row["fixed_5"]["top5"],
+    )
+
+    print(
+        "Gold top-5 @20:      ",
+        row["fixed_20"]["top5"],
+    )
 
 # --------------------------------------------------
 # Save detailed results

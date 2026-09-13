@@ -2,13 +2,28 @@ mod alignment;
 mod bm25;
 mod decision;
 mod reranker;
+mod overlap;
 mod tacer;
+mod acquisition;
 
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
+use tacer::choose_action;
+use tacer::types::EvidenceState;
+use acquisition::{
+    extract_passages,
+    rank_passages,
+    relevance_concentration,
+    source_diversity,
+    SearchProvider,
+    SearchRequest,
+    SourceFetcher,
+    TavilySearchProvider,
+};
+
 
 #[derive(Deserialize)]
 struct Passage {
@@ -201,6 +216,36 @@ fn infer_tacer<'a>(
     serde_json::from_slice(&output.stdout)
         .expect("Could not parse TACER result")
 }
+
+fn select_top_alignment<'a>(
+    candidates: Vec<bm25::EvidenceCandidate<'a>>,
+    inference: &TacerInferenceResponse,
+    limit: usize,
+) -> Vec<bm25::EvidenceCandidate<'a>> {
+    let mut ranked: Vec<_> = candidates
+        .into_iter()
+        .zip(inference.candidates.iter())
+        .map(|(candidate, scored)| {
+            (
+                candidate,
+                scored.alignment_score,
+            )
+        })
+        .collect();
+
+    ranked.sort_by(|a, b| {
+        b.1.total_cmp(&a.1)
+    });
+
+    ranked.truncate(limit);
+
+    ranked
+        .into_iter()
+        .map(|(candidate, _)| candidate)
+        .collect()
+}
+
+
 // --------------------------------------------------
 // CLI
 // --------------------------------------------------
@@ -230,8 +275,245 @@ fn main() {
     let args = Args::parse();
     let claim = args.claim;
 
+    // --------------------------------------------------
+    // Online evidence discovery
+    // --------------------------------------------------
+
+    println!("\nONLINE EVIDENCE SEARCH");
+
+    let search_provider =
+        TavilySearchProvider::from_env()
+            .expect("Could not initialize search provider");
+
+    let search_request = SearchRequest {
+        query: claim.clone(),
+        limit: 5,
+    };
+
+    let search_results =
+        search_provider
+            .search(&search_request)
+            .expect("Online evidence search failed");
+
+    for (index, result) in search_results.iter().enumerate() {
+        println!("\n--------------------------------");
+
+        println!(
+            "{}. {}",
+            index + 1,
+            result.title
+        );
+
+        println!("URL: {}", result.url);
+
+        if let Some(snippet) = &result.snippet {
+            println!("Discovery text: {}", snippet);
+        }
+    }
+
+    // --------------------------------------------------
+    // Fetch and extract real source evidence
+    // --------------------------------------------------
+
+    println!("\n================================");
+    println!("ONLINE EVIDENCE ACQUISITION");
+    println!("================================");
+
+    let fetcher =
+        SourceFetcher::new()
+            .expect("Could not initialize source fetcher");
+
+    let mut online_passages = Vec::new();
+
+    for result in &search_results {
+        println!("\n--------------------------------");
+        println!("Source: {}", result.title);
+        println!("URL: {}", result.url);
+
+        match fetcher.fetch(result) {
+            Ok(document) => {
+                println!(
+                    "Content type: {:?}",
+                    document.content_type
+                );
+
+                match extract_passages(&document) {
+                    Ok(passages) => {
+                        println!(
+                            "Extracted passages: {}",
+                            passages.len()
+                        );
+
+                        online_passages.extend(passages);
+                    }
+
+                    Err(error) => {
+                        println!(
+                            "Extraction skipped: {}",
+                            error
+                        );
+                    }
+                }
+            }
+
+            Err(error) => {
+                println!(
+                    "Fetch failed: {}",
+                    error
+                );
+            }
+        }
+    }
+
+    println!(
+        "\nTotal online evidence passages: {}",
+        online_passages.len()
+    );
+
+    println!("\n================================");
+    println!("ONLINE EVIDENCE RANKING");
+    println!("================================");
+
+    let ranked_online_passages =
+        rank_passages(
+            &claim,
+            &online_passages,
+        )
+        .expect(
+            "Could not rank online evidence"
+        );
+
+    println!(
+        "Scored passages: {}",
+        ranked_online_passages.len()
+    );
+
+    for (index, scored) in
+        ranked_online_passages
+            .iter()
+            .take(10)
+            .enumerate()
+    {
+        println!("\n--------------------------------");
+
+        println!(
+            "{}. relevance={:.4}",
+            index + 1,
+            scored.relevance_score
+        );
+
+        println!(
+            "Source: {}",
+            scored.passage.source_title
+        );
+
+        println!(
+            "URL: {}",
+            scored.passage.source_url
+        );
+
+        println!(
+            "{}",
+            scored.passage.text
+        );
+    }
+
     println!("\nCLAIM");
     println!("{claim}");
+
+    println!("\n================================");
+    println!("ONLINE TACER STATE");
+    println!("================================");
+
+    let positive_passages: Vec<&str> =
+        ranked_online_passages
+            .iter()
+            .filter(|passage| {
+                passage.relevance_score > 0.0
+            })
+            .map(|passage| {
+                passage.passage.text.as_str()
+            })
+            .collect();
+
+    let coverage =
+        overlap::claim_coverage(
+            &claim,
+            positive_passages,
+        );
+
+    let concentration =
+        relevance_concentration(
+            &ranked_online_passages,
+        );
+
+    let diversity =
+        source_diversity(
+            &ranked_online_passages,
+        );
+
+    let online_state = EvidenceState {
+        candidate_count:
+            ranked_online_passages.len(),
+
+        relevance_concentration:
+            concentration,
+
+        claim_coverage:
+            coverage,
+
+        ranker_agreement:
+            f64::NAN,
+
+        source_diversity:
+            diversity,
+
+        source_quality:
+            f64::NAN,
+
+        support_strength:
+            f64::NAN,
+
+        contradiction_strength:
+            f64::NAN,
+
+        evidence_conflict:
+            f64::NAN,
+
+        retrieval_novelty:
+            f64::NAN,
+
+        iteration:
+            0,
+    };
+
+    println!(
+        "Candidates:              {}",
+        online_state.candidate_count
+    );
+
+    println!(
+        "Relevance concentration: {:.3}",
+        online_state.relevance_concentration
+    );
+
+    println!(
+        "Claim coverage:           {:.3}",
+        online_state.claim_coverage
+    );
+
+    println!(
+        "Source diversity:         {:.3}",
+        online_state.source_diversity
+    );
+
+    let online_action =
+        choose_action(&online_state);
+
+    println!(
+        "TACER action:             {:?}",
+        online_action
+    );
 
     // --------------------------------------------------
     // Document retrieval
@@ -253,16 +535,7 @@ fn main() {
         );
     }
 
-    // --------------------------------------------------
-    // Passage retrieval
-    // --------------------------------------------------
-
-    let passages =
-        bm25.search_passages(
-            &claim,
-            &documents,
-            5,
-        );
+    
 
     // --------------------------------------------------
     // Learned TACER-A inference
@@ -288,9 +561,9 @@ fn main() {
     );
 
     let tacer_route =
-        tacer::route_initial(
-            tacer_inference.probability_sufficient
-        );
+    tacer::route_initial(
+        tacer_inference.probability_sufficient
+    );
 
     println!(
         "Route: {:?}",
@@ -302,12 +575,60 @@ fn main() {
         tacer_inference.candidates.len()
     );
 
+    let final_passages =
+    
+    if tacer_route == tacer::EvidenceRoute::Expanded {
+        println!("\n================================");
+        println!("TACER-A EXPANSION");
+        println!("================================");
+
+        let expanded_documents =
+            bm25.search(&claim, 20);
+
+        println!(
+            "Expanded retrieval depth: {}",
+            expanded_documents.len()
+        );
+
+        let expanded_candidates =
+            bm25.all_passages(&expanded_documents);
+
+        let expanded_tacer_inference =
+            infer_tacer(
+                &claim,
+                &expanded_documents,
+                &expanded_candidates,
+            );
+
+        println!(
+            "Expanded P(sufficient): {:.6}",
+            expanded_tacer_inference.probability_sufficient
+        );
+
+        println!(
+            "Expanded candidates evaluated: {}",
+            expanded_tacer_inference.candidates.len()
+        );
+
+        select_top_alignment(
+            expanded_candidates,
+            &expanded_tacer_inference,
+            5,
+        )
+    } else {
+        select_top_alignment(
+            tacer_candidates,
+            &tacer_inference,
+            5,
+        )
+    };
+
     // --------------------------------------------------
     // Semantic reranking
     // --------------------------------------------------
 
     let reranked =
-        reranker::rerank(&claim, &passages);
+        reranker::rerank(&claim, &final_passages);
 
     println!("\nRERANKED EVIDENCE");
 
@@ -513,12 +834,12 @@ fn main() {
     // evidence selection yet.
     // --------------------------------------------------
 
-    let evidence: Vec<&str> = passages
-        .iter()
-        .map(|candidate| {
-            candidate.passage.text.as_str()
-        })
-        .collect();
+    let evidence: Vec<&str> = final_passages
+    .iter()
+    .map(|candidate| {
+        candidate.passage.text.as_str()
+    })
+    .collect();
 
     // --------------------------------------------------
     // Batch verification
@@ -533,7 +854,7 @@ fn main() {
 
     println!("\nEVIDENCE VERIFICATION");
 
-    for (index, (candidate, result)) in passages
+    for (index, (candidate, result)) in final_passages
         .iter()
         .zip(verification.results.iter())
         .enumerate()

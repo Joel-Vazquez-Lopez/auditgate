@@ -1,0 +1,97 @@
+
+==============================================================================
+SELECTIVE MERGE V1 DIAGNOSTIC
+==============================================================================
+
+Claims:                         188
+Expanded:                       54
+
+CANDIDATE RECALL LOSSES
+--------------------------------------------------
+TACER → Selective-3 losses:     13
+TACER → Selective-5 losses:     11
+
+WHY SELECTIVE-3 LOST INITIAL GOLD
+--------------------------------------------------
+Gold below initial top 5:       4
+Gold below logged top 10:       5
+Unexpected losses:              0
+
+PAIRWISE RANKING CHANGES VS TACER
+------------------------------------------------------------------------------
+STRATEGY       METRIC        BETTER     WORSE      SAME
+selective_3    R@1                0         0       188
+selective_3    R@3                0         0       188
+selective_3    R@5                3         1       184
+selective_5    R@1                0         0       188
+selective_5    R@3                0         0       188
+selective_5    R@5                0         0       188
+
+==============================================================================
+INITIAL EVIDENCE LOST BY SELECTIVE-3
+==============================================================================
+
+------------------------------------------------------------------------------
+1. scifact:3
+1,000 genomes project enables mapping of genetic sequence variation consisting of rare variants with larger penetrance effects than common variants.
+Initial gold alignment rank: None
+Reason: gold_below_logged_top10
+TACER P(sufficient): 0.110
+
+------------------------------------------------------------------------------
+2. scifact:513
+High cardiopulmonary fitness causes increased mortality rate.
+Initial gold alignment rank: 10
+Reason: gold_below_initial_top5
+TACER P(sufficient): 0.516
+
+------------------------------------------------------------------------------
+3. scifact:540
+Hypothalamic glutamate neurotransmission is crucial to energy balance.
+Initial gold alignment rank: None
+Reason: gold_below_logged_top10
+TACER P(sufficient): 0.524
+
+------------------------------------------------------------------------------
+4. scifact:718
+Low nucleosome occupancy correlates with low methylation levels across species.
+Initial gold alignment rank: 9
+Reason: gold_below_initial_top5
+TACER P(sufficient): 0.114
+
+------------------------------------------------------------------------------
+5. scifact:743
+Macrolides protect against myocardial infarction.
+Initial gold alignment rank: None
+Reason: gold_below_logged_top10
+TACER P(sufficient): 0.395
+
+------------------------------------------------------------------------------
+6. scifact:793
+Mitochondria are uninvolved in apoptosis.
+Initial gold alignment rank: None
+Reason: gold_below_logged_top10
+TACER P(sufficient): 0.003
+
+------------------------------------------------------------------------------
+7. scifact:1019
+Rapid phosphotransfer rates govern fidelity in two component systems
+Initial gold alignment rank: None
+Reason: gold_below_logged_top10
+TACER P(sufficient): 0.180
+
+------------------------------------------------------------------------------
+8. scifact:1150
+Tetraspanin-3 is a causative factor in the development of acute myelogenous leukemia
+Initial gold alignment rank: 6
+Reason: gold_below_initial_top5
+TACER P(sufficient): 0.171
+
+------------------------------------------------------------------------------
+9. scifact:1320
+Transplanted human glial progenitor cells are incapable of forming a neural network with host animals' neurons.
+Initial gold alignment rank: 9
+Reason: gold_below_initial_top5
+TACER P(sufficient): 0.278
+
+Saved to: results/tacer/selective_merge_v1_diagnostic.json

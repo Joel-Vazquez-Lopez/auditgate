@@ -1,0 +1,104 @@
+Train states: 505
+Dev states:   188
+
+======================================================================
+TACER-B EXPERIMENT: confidence
+======================================================================
+Features:          2
+Accuracy:          0.957
+Balanced accuracy: 0.957
+ROC-AUC:           0.980
+PR-AUC positive:   0.966
+
+Confusion matrix
+[[98  4]
+ [ 4 82]]
+
+              precision    recall  f1-score   support
+
+           0      0.961     0.961     0.961       102
+           1      0.953     0.953     0.953        86
+
+    accuracy                          0.957       188
+   macro avg      0.957     0.957     0.957       188
+weighted avg      0.957     0.957     0.957       188
+
+
+======================================================================
+TACER-B EXPERIMENT: verifier
+======================================================================
+Features:          7
+Accuracy:          0.957
+Balanced accuracy: 0.958
+ROC-AUC:           0.979
+PR-AUC positive:   0.966
+
+Confusion matrix
+[[97  5]
+ [ 3 83]]
+
+              precision    recall  f1-score   support
+
+           0      0.970     0.951     0.960       102
+           1      0.943     0.965     0.954        86
+
+    accuracy                          0.957       188
+   macro avg      0.957     0.958     0.957       188
+weighted avg      0.958     0.957     0.957       188
+
+
+======================================================================
+TACER-B EXPERIMENT: retrieval
+======================================================================
+Features:          23
+Accuracy:          0.500
+Balanced accuracy: 0.498
+ROC-AUC:           0.490
+PR-AUC positive:   0.459
+
+Confusion matrix
+[[53 49]
+ [45 41]]
+
+              precision    recall  f1-score   support
+
+           0      0.541     0.520     0.530       102
+           1      0.456     0.477     0.466        86
+
+    accuracy                          0.500       188
+   macro avg      0.498     0.498     0.498       188
+weighted avg      0.502     0.500     0.501       188
+
+
+======================================================================
+TACER-B EXPERIMENT: full
+======================================================================
+Features:          30
+Accuracy:          0.952
+Balanced accuracy: 0.952
+ROC-AUC:           0.987
+PR-AUC positive:   0.981
+
+Confusion matrix
+[[97  5]
+ [ 4 82]]
+
+              precision    recall  f1-score   support
+
+           0      0.960     0.951     0.956       102
+           1      0.943     0.953     0.948        86
+
+    accuracy                          0.952       188
+   macro avg      0.951     0.952     0.952       188
+weighted avg      0.952     0.952     0.952       188
+
+
+======================================================================
+TACER-B ABLATION SUMMARY
+======================================================================
+MODEL            FEATURES       ACC   BAL ACC   ROC-AUC    PR-AUC
+-----------------------------------------------------------------
+confidence              2     0.957     0.957     0.980     0.966
+verifier                7     0.957     0.958     0.979     0.966
+retrieval              23     0.500     0.498     0.490     0.459
+full                   30     0.952     0.952     0.987     0.981

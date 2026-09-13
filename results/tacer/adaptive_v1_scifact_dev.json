@@ -77,6 +77,17 @@
         "top5": 0,
         "gold_rank": 65
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995637536048889,
+        "max_contradiction": 0.9992008805274963
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996553659439087,
+        "max_contradiction": 0.00114295887760818
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -344,6 +355,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9990783929824829,
+        "max_contradiction": 0.9959509372711182
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9963971972465515,
+        "max_contradiction": 0.9959509372711182
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -611,6 +633,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998332262039185,
+        "max_contradiction": 0.9993780851364136
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998332262039185,
+        "max_contradiction": 0.9993780851364136
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -878,6 +911,17 @@
         "top5": 0,
         "gold_rank": 12
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989432692527771,
+        "max_contradiction": 0.9982972741127014
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989432692527771,
+        "max_contradiction": 0.9982972741127014
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -1145,6 +1189,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999834418296814,
+        "max_contradiction": 0.9950953722000122
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999834418296814,
+        "max_contradiction": 0.9950953722000122
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -1412,6 +1467,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998565912246704,
+        "max_contradiction": 0.0017029494047164917
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998565912246704,
+        "max_contradiction": 0.0017029494047164917
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -1679,6 +1745,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9973932504653931,
+        "max_contradiction": 0.999388575553894
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9973932504653931,
+        "max_contradiction": 0.999388575553894
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -1946,6 +2023,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9991069436073303,
+        "max_contradiction": 0.9925960898399353
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9991069436073303,
+        "max_contradiction": 0.9925960898399353
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -2213,6 +2301,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9981385469436646,
+        "max_contradiction": 0.999366819858551
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9981385469436646,
+        "max_contradiction": 0.999366819858551
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -2480,6 +2579,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998334646224976,
+        "max_contradiction": 0.9986507296562195
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998334646224976,
+        "max_contradiction": 0.9986507296562195
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -2747,6 +2857,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999754011631012,
+        "max_contradiction": 0.9992799162864685
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999754011631012,
+        "max_contradiction": 0.9992799162864685
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -3014,6 +3135,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998383522033691,
+        "max_contradiction": 0.00664636492729187
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998542070388794,
+        "max_contradiction": 0.9985729455947876
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -3281,6 +3413,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9971941709518433,
+        "max_contradiction": 0.9991123080253601
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9971941709518433,
+        "max_contradiction": 0.9991123080253601
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -3548,6 +3691,17 @@
         "top5": 0,
         "gold_rank": 7
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998476505279541,
+        "max_contradiction": 0.9993636012077332
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998476505279541,
+        "max_contradiction": 0.9993636012077332
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -3815,6 +3969,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9958452582359314,
+        "max_contradiction": 0.9893827438354492
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9958452582359314,
+        "max_contradiction": 0.9893827438354492
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -4082,6 +4247,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998219609260559,
+        "max_contradiction": 0.9993182420730591
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998219609260559,
+        "max_contradiction": 0.9993182420730591
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -4349,6 +4525,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995697140693665,
+        "max_contradiction": 0.9412539005279541
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995697140693665,
+        "max_contradiction": 0.9412539005279541
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -4616,6 +4803,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.8805722594261169,
+        "max_contradiction": 0.999371349811554
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.8805722594261169,
+        "max_contradiction": 0.999371349811554
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -4883,6 +5081,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989528656005859,
+        "max_contradiction": 0.9986200332641602
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989528656005859,
+        "max_contradiction": 0.9986200332641602
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -5150,6 +5359,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998098015785217,
+        "max_contradiction": 0.9987311959266663
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998283386230469,
+        "max_contradiction": 0.0009714896441437304
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -5417,6 +5637,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999767005443573,
+        "max_contradiction": 0.9982798099517822
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999767005443573,
+        "max_contradiction": 0.9982798099517822
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -5684,6 +5915,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998519420623779,
+        "max_contradiction": 0.9993513226509094
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998519420623779,
+        "max_contradiction": 0.9993513226509094
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -5951,6 +6193,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993983507156372,
+        "max_contradiction": 0.9993364214897156
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993983507156372,
+        "max_contradiction": 0.9993364214897156
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -6218,6 +6471,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999854326248169,
+        "max_contradiction": 0.9981619715690613
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999854326248169,
+        "max_contradiction": 0.9981619715690613
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -6485,6 +6749,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998347759246826,
+        "max_contradiction": 0.9970771074295044
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998347759246826,
+        "max_contradiction": 0.9970771074295044
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -6752,6 +7027,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998713731765747,
+        "max_contradiction": 0.004029074218124151
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998713731765747,
+        "max_contradiction": 0.004029074218124151
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -7019,6 +7305,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998095631599426,
+        "max_contradiction": 0.9991311430931091
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998095631599426,
+        "max_contradiction": 0.9991311430931091
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -7286,6 +7583,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0014021063689142466,
+        "max_contradiction": 0.9993903636932373
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0014021063689142466,
+        "max_contradiction": 0.9993903636932373
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -7553,6 +7861,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9982557892799377,
+        "max_contradiction": 0.004730359651148319
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9982557892799377,
+        "max_contradiction": 0.004730359651148319
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -7820,6 +8139,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996441602706909,
+        "max_contradiction": 0.9993040561676025
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996441602706909,
+        "max_contradiction": 0.9993040561676025
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -8087,6 +8417,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997689127922058,
+        "max_contradiction": 0.6958326697349548
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996107220649719,
+        "max_contradiction": 0.002209967467933893
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -8354,6 +8695,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.07118101418018341,
+        "max_contradiction": 0.9991831183433533
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.07118101418018341,
+        "max_contradiction": 0.9991831183433533
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -8621,6 +8973,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9970372915267944,
+        "max_contradiction": 0.9993600249290466
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9970372915267944,
+        "max_contradiction": 0.9993600249290466
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -8888,6 +9251,17 @@
         "top5": 0,
         "gold_rank": 8
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995974898338318,
+        "max_contradiction": 0.9991738200187683
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9969793558120728,
+        "max_contradiction": 0.9990895986557007
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -9155,6 +9529,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999169111251831,
+        "max_contradiction": 0.9993733763694763
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999169111251831,
+        "max_contradiction": 0.9993733763694763
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -9422,6 +9807,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998074173927307,
+        "max_contradiction": 0.9989808201789856
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998074173927307,
+        "max_contradiction": 0.9989808201789856
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -9689,6 +10085,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998575448989868,
+        "max_contradiction": 0.9958515167236328
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998575448989868,
+        "max_contradiction": 0.9958515167236328
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -9956,6 +10363,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.006200803909450769,
+        "max_contradiction": 0.9993372559547424
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.006200803909450769,
+        "max_contradiction": 0.9993372559547424
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -10223,6 +10641,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997647404670715,
+        "max_contradiction": 0.9993699193000793
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997647404670715,
+        "max_contradiction": 0.9993699193000793
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -10490,6 +10919,17 @@
         "top5": 0,
         "gold_rank": 13
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9979756474494934,
+        "max_contradiction": 0.9992035031318665
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994742274284363,
+        "max_contradiction": 0.9992035031318665
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -10757,6 +11197,17 @@
         "top5": 0,
         "gold_rank": 8
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996985197067261,
+        "max_contradiction": 0.0006413115770556033
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996985197067261,
+        "max_contradiction": 0.002073864918202162
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -11024,6 +11475,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999760091304779,
+        "max_contradiction": 0.006556526757776737
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999760091304779,
+        "max_contradiction": 0.0016116260085254908
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -11291,6 +11753,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997846484184265,
+        "max_contradiction": 0.9980794191360474
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997846484184265,
+        "max_contradiction": 0.9980794191360474
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -11558,6 +12031,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995577931404114,
+        "max_contradiction": 0.9993816614151001
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995577931404114,
+        "max_contradiction": 0.9993816614151001
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -11825,6 +12309,17 @@
         "top5": 0,
         "gold_rank": 6
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998512268066406,
+        "max_contradiction": 0.998927891254425
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998512268066406,
+        "max_contradiction": 0.998927891254425
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -12092,6 +12587,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998477697372437,
+        "max_contradiction": 0.998557984828949
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998477697372437,
+        "max_contradiction": 0.998557984828949
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -12359,6 +12865,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997813105583191,
+        "max_contradiction": 0.9966501593589783
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997813105583191,
+        "max_contradiction": 0.9966501593589783
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -12626,6 +13143,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999847412109375,
+        "max_contradiction": 0.0032956863287836313
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999847412109375,
+        "max_contradiction": 0.0032956863287836313
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -12893,6 +13421,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998213648796082,
+        "max_contradiction": 0.0013149838196113706
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998213648796082,
+        "max_contradiction": 0.0013149838196113706
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -13160,6 +13699,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996150732040405,
+        "max_contradiction": 0.03187819942831993
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996150732040405,
+        "max_contradiction": 0.03187819942831993
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -13427,6 +13977,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998094439506531,
+        "max_contradiction": 0.00038938684156164527
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998094439506531,
+        "max_contradiction": 0.00038938684156164527
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -13694,6 +14255,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995718598365784,
+        "max_contradiction": 0.9990764856338501
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995718598365784,
+        "max_contradiction": 0.9990764856338501
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -13961,6 +14533,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9982855916023254,
+        "max_contradiction": 0.9993852376937866
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9982855916023254,
+        "max_contradiction": 0.9993852376937866
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -14228,6 +14811,17 @@
         "top5": 0,
         "gold_rank": 25
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998242259025574,
+        "max_contradiction": 0.9992191791534424
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998242259025574,
+        "max_contradiction": 0.9992191791534424
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -14495,6 +15089,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997884631156921,
+        "max_contradiction": 0.9989640712738037
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997884631156921,
+        "max_contradiction": 0.9989640712738037
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -14762,6 +15367,17 @@
         "top5": 0,
         "gold_rank": 50
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999860405921936,
+        "max_contradiction": 0.00021446832397487015
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998451471328735,
+        "max_contradiction": 0.0002166731283068657
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -15029,6 +15645,17 @@
         "top5": 1,
         "gold_rank": 4
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997490048408508,
+        "max_contradiction": 0.006034880876541138
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997490048408508,
+        "max_contradiction": 0.006034880876541138
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -15296,6 +15923,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994751811027527,
+        "max_contradiction": 0.9980190992355347
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994751811027527,
+        "max_contradiction": 0.9980190992355347
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -15563,6 +16201,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998210072517395,
+        "max_contradiction": 0.006378969177603722
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998210072517395,
+        "max_contradiction": 0.006378969177603722
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -15830,6 +16479,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998666048049927,
+        "max_contradiction": 0.646766722202301
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998584985733032,
+        "max_contradiction": 0.9072085022926331
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -16097,6 +16757,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989012479782104,
+        "max_contradiction": 0.9986854195594788
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989012479782104,
+        "max_contradiction": 0.9986854195594788
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -16364,6 +17035,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999873161315918,
+        "max_contradiction": 0.0011670487001538277
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999873161315918,
+        "max_contradiction": 0.0011670487001538277
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -16631,6 +17313,17 @@
         "top5": 0,
         "gold_rank": 14
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0008052426856011152,
+        "max_contradiction": 0.999387264251709
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996273517608643,
+        "max_contradiction": 0.999387264251709
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -16898,6 +17591,17 @@
         "top5": 0,
         "gold_rank": 44
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998674392700195,
+        "max_contradiction": 0.018731428310275078
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996827840805054,
+        "max_contradiction": 0.0009309659944847226
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -17165,6 +17869,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989712238311768,
+        "max_contradiction": 0.9993884563446045
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989712238311768,
+        "max_contradiction": 0.9993884563446045
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -17432,6 +18147,17 @@
         "top5": 0,
         "gold_rank": 16
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.2930026352405548,
+        "max_contradiction": 0.9992917776107788
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0011124309385195374,
+        "max_contradiction": 0.9992917776107788
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -17699,6 +18425,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0007054478628560901,
+        "max_contradiction": 0.9993879795074463
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0007054478628560901,
+        "max_contradiction": 0.9993879795074463
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -17966,6 +18703,17 @@
         "top5": 0,
         "gold_rank": 19
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.998111367225647,
+        "max_contradiction": 0.9990015625953674
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.998111367225647,
+        "max_contradiction": 0.9990015625953674
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -18233,6 +18981,17 @@
         "top5": 0,
         "gold_rank": 20
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999626874923706,
+        "max_contradiction": 0.09945487231016159
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999626874923706,
+        "max_contradiction": 0.09945487231016159
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -18500,6 +19259,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998354911804199,
+        "max_contradiction": 0.0005065120640210807
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998354911804199,
+        "max_contradiction": 0.0005065120640210807
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -18767,6 +19537,17 @@
         "top5": 0,
         "gold_rank": 18
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0009612879948690534,
+        "max_contradiction": 0.9993070363998413
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.012168045155704021,
+        "max_contradiction": 0.9993634819984436
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -19034,6 +19815,17 @@
         "top5": 0,
         "gold_rank": 18
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998182654380798,
+        "max_contradiction": 0.0204649455845356
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997833371162415,
+        "max_contradiction": 0.9721323847770691
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -19301,6 +20093,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998326301574707,
+        "max_contradiction": 0.013013566844165325
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998326301574707,
+        "max_contradiction": 0.6703988909721375
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -19568,6 +20371,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996916055679321,
+        "max_contradiction": 0.9963917136192322
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996916055679321,
+        "max_contradiction": 0.9963917136192322
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -19835,6 +20649,17 @@
         "top5": 0,
         "gold_rank": 86
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9995160102844238,
+        "max_contradiction": 0.004142099060118198
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996511936187744,
+        "max_contradiction": 0.0010160848032683134
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -20102,6 +20927,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998108744621277,
+        "max_contradiction": 0.21166624128818512
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998108744621277,
+        "max_contradiction": 0.21166624128818512
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -20369,6 +21205,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9984734654426575,
+        "max_contradiction": 0.009878619574010372
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9984734654426575,
+        "max_contradiction": 0.009878619574010372
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -20636,6 +21483,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996048808097839,
+        "max_contradiction": 0.999190628528595
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998624324798584,
+        "max_contradiction": 0.999190628528595
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -20903,6 +21761,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996726512908936,
+        "max_contradiction": 0.9985572695732117
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996726512908936,
+        "max_contradiction": 0.9985572695732117
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -21170,6 +22039,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999135434627533,
+        "max_contradiction": 0.9992696642875671
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999135434627533,
+        "max_contradiction": 0.9992696642875671
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -21437,6 +22317,17 @@
         "top5": 1,
         "gold_rank": 4
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998326301574707,
+        "max_contradiction": 0.9992270469665527
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998326301574707,
+        "max_contradiction": 0.9992270469665527
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -21704,6 +22595,17 @@
         "top5": 0,
         "gold_rank": 139
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.007628076244145632,
+        "max_contradiction": 0.9991782307624817
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.007628076244145632,
+        "max_contradiction": 0.9991782307624817
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -21971,6 +22873,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993625283241272,
+        "max_contradiction": 0.9984157085418701
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993625283241272,
+        "max_contradiction": 0.9984157085418701
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -22238,6 +23151,17 @@
         "top5": 0,
         "gold_rank": 10
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.19448699057102203,
+        "max_contradiction": 0.9992437362670898
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9988330006599426,
+        "max_contradiction": 0.9992740750312805
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -22505,6 +23429,17 @@
         "top5": 0,
         "gold_rank": 7
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996354579925537,
+        "max_contradiction": 0.917060375213623
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997196793556213,
+        "max_contradiction": 0.00042221276089549065
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -22772,6 +23707,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997982382774353,
+        "max_contradiction": 0.000773704145103693
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997982382774353,
+        "max_contradiction": 0.000773704145103693
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -23039,6 +23985,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0006522962939925492,
+        "max_contradiction": 0.9993863105773926
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0006522962939925492,
+        "max_contradiction": 0.9993863105773926
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -23306,6 +24263,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997745156288147,
+        "max_contradiction": 0.9992204904556274
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997745156288147,
+        "max_contradiction": 0.9992204904556274
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -23573,6 +24541,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998553991317749,
+        "max_contradiction": 0.998416543006897
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998553991317749,
+        "max_contradiction": 0.998416543006897
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -23840,6 +24819,17 @@
         "top5": 0,
         "gold_rank": 27
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9930673837661743,
+        "max_contradiction": 0.9991875290870667
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9978618025779724,
+        "max_contradiction": 0.9988351464271545
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -24107,6 +25097,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998652935028076,
+        "max_contradiction": 0.0007807553047314286
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998652935028076,
+        "max_contradiction": 0.0007807553047314286
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -24374,6 +25375,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998745918273926,
+        "max_contradiction": 0.1315428465604782
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998745918273926,
+        "max_contradiction": 0.1315428465604782
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -24641,6 +25653,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.004332750104367733,
+        "max_contradiction": 0.9993482232093811
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993129968643188,
+        "max_contradiction": 0.9993482232093811
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -24908,6 +25931,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996331930160522,
+        "max_contradiction": 0.4277689754962921
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996331930160522,
+        "max_contradiction": 0.4277689754962921
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -25175,6 +26209,17 @@
         "top5": 0,
         "gold_rank": 25
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9988341927528381,
+        "max_contradiction": 0.9992511868476868
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9972002506256104,
+        "max_contradiction": 0.9993597865104675
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -25442,6 +26487,17 @@
         "top5": 0,
         "gold_rank": 45
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9992032647132874,
+        "max_contradiction": 0.9989365935325623
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999022364616394,
+        "max_contradiction": 0.9984703660011292
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -25709,6 +26765,17 @@
         "top5": 1,
         "gold_rank": 5
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998692274093628,
+        "max_contradiction": 0.00413869833573699
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998692274093628,
+        "max_contradiction": 0.00413869833573699
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -25976,6 +27043,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997326731681824,
+        "max_contradiction": 0.0018370819743722677
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997326731681824,
+        "max_contradiction": 0.0018370819743722677
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -26243,6 +27321,17 @@
         "top5": 0,
         "gold_rank": 7
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997333884239197,
+        "max_contradiction": 0.00568153103813529
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997333884239197,
+        "max_contradiction": 0.00568153103813529
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -26510,6 +27599,17 @@
         "top5": 0,
         "gold_rank": 15
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9756508469581604,
+        "max_contradiction": 0.9988881945610046
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9756508469581604,
+        "max_contradiction": 0.9988881945610046
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -26777,6 +27877,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998574256896973,
+        "max_contradiction": 0.9993842840194702
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998574256896973,
+        "max_contradiction": 0.9993842840194702
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -27044,6 +28155,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998437166213989,
+        "max_contradiction": 0.0006721231620758772
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998437166213989,
+        "max_contradiction": 0.0006721231620758772
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -27311,6 +28433,17 @@
         "top5": 0,
         "gold_rank": 68
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0008379934588447213,
+        "max_contradiction": 0.9993543028831482
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0007148310542106628,
+        "max_contradiction": 0.999393105506897
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -27578,6 +28711,17 @@
         "top5": 0,
         "gold_rank": 7
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997106194496155,
+        "max_contradiction": 0.0024666942190378904
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997106194496155,
+        "max_contradiction": 0.0024666942190378904
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -27845,6 +28989,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9991167187690735,
+        "max_contradiction": 0.002211227547377348
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9991167187690735,
+        "max_contradiction": 0.002211227547377348
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -28112,6 +29267,17 @@
         "top5": 1,
         "gold_rank": 4
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0038322925101965666,
+        "max_contradiction": 0.99937504529953
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0038322925101965666,
+        "max_contradiction": 0.99937504529953
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -28379,6 +29545,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998661279678345,
+        "max_contradiction": 0.00020509683236014098
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998661279678345,
+        "max_contradiction": 0.00020509683236014098
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -28646,6 +29823,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998084902763367,
+        "max_contradiction": 0.001501463120803237
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998084902763367,
+        "max_contradiction": 0.001501463120803237
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -28913,6 +30101,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997475743293762,
+        "max_contradiction": 0.00060943333664909
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997475743293762,
+        "max_contradiction": 0.0013681971468031406
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -29180,6 +30379,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996844530105591,
+        "max_contradiction": 0.001347593148238957
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996844530105591,
+        "max_contradiction": 0.001347593148238957
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -29447,6 +30657,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998615980148315,
+        "max_contradiction": 0.9986664056777954
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998615980148315,
+        "max_contradiction": 0.9986664056777954
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -29714,6 +30935,17 @@
         "top5": 0,
         "gold_rank": 50
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997772574424744,
+        "max_contradiction": 0.9985557198524475
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997772574424744,
+        "max_contradiction": 0.9985557198524475
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -29981,6 +31213,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994685053825378,
+        "max_contradiction": 0.9975032210350037
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994685053825378,
+        "max_contradiction": 0.9975032210350037
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -30248,6 +31491,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999514102935791,
+        "max_contradiction": 0.001793739851564169
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999514102935791,
+        "max_contradiction": 0.001793739851564169
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -30515,6 +31769,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.007955704815685749,
+        "max_contradiction": 0.9991428852081299
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.008138931356370449,
+        "max_contradiction": 0.9992402791976929
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -30782,6 +32047,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9979569911956787,
+        "max_contradiction": 0.9992565512657166
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9979569911956787,
+        "max_contradiction": 0.9992565512657166
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -31049,6 +32325,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998387098312378,
+        "max_contradiction": 0.00049623689847067
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998387098312378,
+        "max_contradiction": 0.02605658955872059
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -31316,6 +32603,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9981110095977783,
+        "max_contradiction": 0.9993539452552795
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9981110095977783,
+        "max_contradiction": 0.9993539452552795
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -31583,6 +32881,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995095729827881,
+        "max_contradiction": 0.9993615746498108
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995095729827881,
+        "max_contradiction": 0.9993615746498108
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -31850,6 +33159,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997302889823914,
+        "max_contradiction": 0.9992511868476868
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997302889823914,
+        "max_contradiction": 0.9992511868476868
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -32117,6 +33437,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998722076416016,
+        "max_contradiction": 0.817402184009552
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998722076416016,
+        "max_contradiction": 0.0017603271408006549
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -32384,6 +33715,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996696710586548,
+        "max_contradiction": 0.8912336826324463
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996696710586548,
+        "max_contradiction": 0.8912336826324463
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -32651,6 +33993,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.002494674175977707,
+        "max_contradiction": 0.9993684887886047
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.002494674175977707,
+        "max_contradiction": 0.9993684887886047
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -32918,6 +34271,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997996687889099,
+        "max_contradiction": 0.0011921210680156946
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997996687889099,
+        "max_contradiction": 0.0011921210680156946
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -33185,6 +34549,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997660517692566,
+        "max_contradiction": 0.10179002583026886
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998434782028198,
+        "max_contradiction": 0.10179002583026886
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -33452,6 +34827,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997887015342712,
+        "max_contradiction": 0.9950799942016602
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997887015342712,
+        "max_contradiction": 0.9950799942016602
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -33719,6 +35105,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996511936187744,
+        "max_contradiction": 0.998349666595459
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996424913406372,
+        "max_contradiction": 0.9988299012184143
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -33986,6 +35383,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998382329940796,
+        "max_contradiction": 0.9989394545555115
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998382329940796,
+        "max_contradiction": 0.9989394545555115
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -34253,6 +35661,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999530553817749,
+        "max_contradiction": 0.000877490034326911
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.999530553817749,
+        "max_contradiction": 0.000877490034326911
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -34520,6 +35939,17 @@
         "top5": 0,
         "gold_rank": 16
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998012185096741,
+        "max_contradiction": 0.0006115559372119606
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998012185096741,
+        "max_contradiction": 0.0006115559372119606
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -34787,6 +36217,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993195533752441,
+        "max_contradiction": 0.9909542202949524
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993195533752441,
+        "max_contradiction": 0.9909542202949524
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -35054,6 +36495,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998407363891602,
+        "max_contradiction": 0.998514711856842
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998407363891602,
+        "max_contradiction": 0.998514711856842
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -35321,6 +36773,17 @@
         "top5": 0,
         "gold_rank": 81
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997408986091614,
+        "max_contradiction": 0.00790898222476244
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997408986091614,
+        "max_contradiction": 0.0013246993767097592
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -35588,6 +37051,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996623992919922,
+        "max_contradiction": 0.9972403049468994
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9995946288108826,
+        "max_contradiction": 0.9986709356307983
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -35855,6 +37329,17 @@
         "top5": 0,
         "gold_rank": 8
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999725878238678,
+        "max_contradiction": 0.9987778067588806
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9978158473968506,
+        "max_contradiction": 0.9982762336730957
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -36122,6 +37607,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9995658993721008,
+        "max_contradiction": 0.0009417565306648612
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9995658993721008,
+        "max_contradiction": 0.0009417565306648612
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -36389,6 +37885,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9958356618881226,
+        "max_contradiction": 0.9991456270217896
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9958356618881226,
+        "max_contradiction": 0.9991456270217896
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -36656,6 +38163,17 @@
         "top5": 0,
         "gold_rank": 27
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9991695880889893,
+        "max_contradiction": 0.9993820190429688
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9991695880889893,
+        "max_contradiction": 0.9993820190429688
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -36923,6 +38441,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0024487038608640432,
+        "max_contradiction": 0.9993298053741455
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.7204818725585938,
+        "max_contradiction": 0.9993281364440918
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -37190,6 +38719,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998589754104614,
+        "max_contradiction": 0.00044938549399375916
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998589754104614,
+        "max_contradiction": 0.00044938549399375916
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -37457,6 +38997,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998160004615784,
+        "max_contradiction": 0.001760053331963718
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998160004615784,
+        "max_contradiction": 0.001760053331963718
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -37724,6 +39275,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9183329939842224,
+        "max_contradiction": 0.9987843632698059
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9987797141075134,
+        "max_contradiction": 0.9987843632698059
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -37991,6 +39553,17 @@
         "top5": 0,
         "gold_rank": 8
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998223185539246,
+        "max_contradiction": 0.0008145145257003605
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998223185539246,
+        "max_contradiction": 0.0008145145257003605
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -38258,6 +39831,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9992538094520569,
+        "max_contradiction": 0.9993674159049988
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9992538094520569,
+        "max_contradiction": 0.9993674159049988
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -38525,6 +40109,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998512268066406,
+        "max_contradiction": 0.9992275238037109
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998512268066406,
+        "max_contradiction": 0.9992275238037109
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -38792,6 +40387,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0034455342683941126,
+        "max_contradiction": 0.9992862343788147
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9872813820838928,
+        "max_contradiction": 0.999323844909668
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -39059,6 +40665,17 @@
         "top5": 0,
         "gold_rank": 9
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998704195022583,
+        "max_contradiction": 0.0006870570941828191
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998704195022583,
+        "max_contradiction": 0.0016754812095314264
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -39326,6 +40943,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989733695983887,
+        "max_contradiction": 0.9991928935050964
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989733695983887,
+        "max_contradiction": 0.9991928935050964
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -39593,6 +41221,17 @@
         "top5": 0,
         "gold_rank": 6
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997645020484924,
+        "max_contradiction": 0.0041425395756959915
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997645020484924,
+        "max_contradiction": 0.0041425395756959915
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -39860,6 +41499,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998453855514526,
+        "max_contradiction": 0.9991922974586487
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998453855514526,
+        "max_contradiction": 0.9991922974586487
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -40127,6 +41777,17 @@
         "top5": 1,
         "gold_rank": 4
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9994261264801025,
+        "max_contradiction": 0.8281131386756897
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994427561759949,
+        "max_contradiction": 0.9992038607597351
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -40394,6 +42055,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997076392173767,
+        "max_contradiction": 0.9993495345115662
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997076392173767,
+        "max_contradiction": 0.9993495345115662
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -40661,6 +42333,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996609687805176,
+        "max_contradiction": 0.9983617663383484
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996609687805176,
+        "max_contradiction": 0.9983617663383484
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -40928,6 +42611,17 @@
         "top5": 0,
         "gold_rank": 15
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9994955062866211,
+        "max_contradiction": 0.013087318278849125
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9993951320648193,
+        "max_contradiction": 0.013087318278849125
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -41195,6 +42889,17 @@
         "top5": 0,
         "gold_rank": 8
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996744394302368,
+        "max_contradiction": 0.006171123124659061
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996744394302368,
+        "max_contradiction": 0.006171123124659061
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -41462,6 +43167,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998605251312256,
+        "max_contradiction": 0.0002125962491845712
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998605251312256,
+        "max_contradiction": 0.0002125962491845712
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -41729,6 +43445,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9990122318267822,
+        "max_contradiction": 0.0072077917866408825
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9990122318267822,
+        "max_contradiction": 0.0072077917866408825
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -41996,6 +43723,17 @@
         "top5": 1,
         "gold_rank": 4
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998388290405273,
+        "max_contradiction": 0.0005340996431186795
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998388290405273,
+        "max_contradiction": 0.0005340996431186795
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -42263,6 +44001,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996738433837891,
+        "max_contradiction": 0.0011898193042725325
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996738433837891,
+        "max_contradiction": 0.0011898193042725325
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -42530,6 +44279,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998286962509155,
+        "max_contradiction": 0.0017067465232685208
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998286962509155,
+        "max_contradiction": 0.0017067465232685208
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -42797,6 +44557,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998536109924316,
+        "max_contradiction": 0.0014292593114078045
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9993032217025757,
+        "max_contradiction": 0.0014292626874521375
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -43064,6 +44835,17 @@
         "top5": 1,
         "gold_rank": 5
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9995235204696655,
+        "max_contradiction": 0.0016017534071579576
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9985376596450806,
+        "max_contradiction": 0.9987186193466187
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -43331,6 +45113,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997528195381165,
+        "max_contradiction": 0.999362051486969
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997528195381165,
+        "max_contradiction": 0.999362051486969
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -43598,6 +45391,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994264841079712,
+        "max_contradiction": 0.9986788630485535
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9994871616363525,
+        "max_contradiction": 0.9978228807449341
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -43865,6 +45669,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997188448905945,
+        "max_contradiction": 0.14954520761966705
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997188448905945,
+        "max_contradiction": 0.14954520761966705
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -44132,6 +45947,17 @@
         "top5": 0,
         "gold_rank": 10
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998292922973633,
+        "max_contradiction": 0.009923292323946953
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998292922973633,
+        "max_contradiction": 0.009923292323946953
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -44399,6 +46225,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999863862991333,
+        "max_contradiction": 0.9937769174575806
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.999863862991333,
+        "max_contradiction": 0.9937769174575806
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -44666,6 +46503,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9978881478309631,
+        "max_contradiction": 0.9992725253105164
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9978881478309631,
+        "max_contradiction": 0.9992725253105164
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -44933,6 +46781,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997124075889587,
+        "max_contradiction": 0.0008107843459583819
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9997124075889587,
+        "max_contradiction": 0.0008107843459583819
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -45200,6 +47059,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9991136193275452,
+        "max_contradiction": 0.9991762042045593
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9991136193275452,
+        "max_contradiction": 0.9991762042045593
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -45467,6 +47337,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998555183410645,
+        "max_contradiction": 0.0005095070227980614
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998555183410645,
+        "max_contradiction": 0.0005095070227980614
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -45734,6 +47615,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.14333680272102356,
+        "max_contradiction": 0.9993528723716736
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.14333680272102356,
+        "max_contradiction": 0.9993528723716736
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -46001,6 +47893,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998120665550232,
+        "max_contradiction": 0.9992220401763916
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998120665550232,
+        "max_contradiction": 0.9992220401763916
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -46268,6 +48171,17 @@
         "top5": 0,
         "gold_rank": null
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9996374845504761,
+        "max_contradiction": 0.9993232488632202
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9871396422386169,
+        "max_contradiction": 0.9988402724266052
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 0,
         "top1": 0,
@@ -46535,6 +48449,17 @@
         "top5": 0,
         "gold_rank": 9
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998340606689453,
+        "max_contradiction": 0.9985904097557068
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998340606689453,
+        "max_contradiction": 0.02260659448802471
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -46802,6 +48727,17 @@
         "top5": 0,
         "gold_rank": 46
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9989448189735413,
+        "max_contradiction": 0.9993908405303955
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9992687106132507,
+        "max_contradiction": 0.9993785619735718
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -47069,6 +49005,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993569254875183,
+        "max_contradiction": 0.9992801547050476
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9993569254875183,
+        "max_contradiction": 0.9992801547050476
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -47336,6 +49283,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998615980148315,
+        "max_contradiction": 0.9991359114646912
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998615980148315,
+        "max_contradiction": 0.9991359114646912
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -47603,6 +49561,17 @@
         "top5": 1,
         "gold_rank": 3
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996880292892456,
+        "max_contradiction": 0.001117278472520411
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9995803236961365,
+        "max_contradiction": 0.002123541198670864
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -47870,6 +49839,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0006931306561455131,
+        "max_contradiction": 0.9993938207626343
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0006931306561455131,
+        "max_contradiction": 0.9993938207626343
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -48137,6 +50117,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998370409011841,
+        "max_contradiction": 0.0005407560965977609
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998370409011841,
+        "max_contradiction": 0.0005407560965977609
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -48404,6 +50395,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.44691887497901917,
+        "max_contradiction": 0.9993240833282471
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.44691887497901917,
+        "max_contradiction": 0.9993240833282471
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -48671,6 +50673,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996581077575684,
+        "max_contradiction": 0.002575109712779522
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9998382329940796,
+        "max_contradiction": 0.0016384543851017952
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -48938,6 +50951,17 @@
         "top5": 0,
         "gold_rank": 7
       },
+      "baseline_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0007741772569715977,
+        "max_contradiction": 0.9993858337402344
+      },
+      "adaptive_verification": {
+        "decision": "BLOCK",
+        "max_support": 0.0013408004306256771,
+        "max_contradiction": 0.9993618130683899
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -49205,6 +51229,17 @@
         "top5": 1,
         "gold_rank": 2
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998595714569092,
+        "max_contradiction": 0.981696367263794
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9998595714569092,
+        "max_contradiction": 0.981696367263794
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 0,
@@ -49472,6 +51507,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997183680534363,
+        "max_contradiction": 0.9976062774658203
+      },
+      "adaptive_verification": {
+        "decision": "ALLOW",
+        "max_support": 0.9996285438537598,
+        "max_contradiction": 0.001695146202109754
+      },
+      "gold_label": "contradicted",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -49739,6 +51785,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997754693031311,
+        "max_contradiction": 0.9992732405662537
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9997754693031311,
+        "max_contradiction": 0.9992732405662537
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
@@ -50006,6 +52063,17 @@
         "top5": 1,
         "gold_rank": 1
       },
+      "baseline_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9992110729217529,
+        "max_contradiction": 0.9977099895477295
+      },
+      "adaptive_verification": {
+        "decision": "REVIEW",
+        "max_support": 0.9992110729217529,
+        "max_contradiction": 0.9977099895477295
+      },
+      "gold_label": "supported",
       "adaptive": {
         "candidate_success": 1,
         "top1": 1,
