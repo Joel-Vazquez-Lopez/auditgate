@@ -1,10 +1,7 @@
 use crate::tacer::types::RetrievalSignals;
 
 pub fn retrieval_signals(scores: &[f64]) -> RetrievalSignals {
-    let scores: Vec<f64> = scores
-        .iter()
-        .map(|score| score.max(0.0))
-        .collect();
+    let scores: Vec<f64> = scores.iter().map(|score| score.max(0.0)).collect();
 
     if scores.is_empty() {
         return RetrievalSignals {
@@ -27,8 +24,7 @@ pub fn retrieval_signals(scores: &[f64]) -> RetrievalSignals {
 
     let top_score = scores[0];
 
-    let mean_score =
-        scores.iter().sum::<f64>() / scores.len() as f64;
+    let mean_score = scores.iter().sum::<f64>() / scores.len() as f64;
 
     let variance = scores
         .iter()
@@ -66,15 +62,13 @@ pub fn retrieval_signals(scores: &[f64]) -> RetrievalSignals {
         0.0
     };
 
-    let top1_to_top5 =
-        if scores.len() >= 5 && scores[4] > 0.0 {
-            scores[0] / scores[4]
-        } else {
-            0.0
-        };
+    let top1_to_top5 = if scores.len() >= 5 && scores[4] > 0.0 {
+        scores[0] / scores[4]
+    } else {
+        0.0
+    };
 
-    let top8_sum: f64 =
-        scores.iter().take(8).sum();
+    let top8_sum: f64 = scores.iter().take(8).sum();
 
     let top3_to_top8 = if top8_sum > 0.0 {
         scores.iter().take(3).sum::<f64>() / top8_sum

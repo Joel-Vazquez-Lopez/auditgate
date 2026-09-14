@@ -1,28 +1,19 @@
-use crate::tacer::types::{
-    EvidenceState,
-    RetrievalAction,
-};
+use crate::tacer::types::{EvidenceState, RetrievalAction};
 
-pub fn choose_action(
-    state: &EvidenceState,
-) -> RetrievalAction {
+pub fn choose_action(state: &EvidenceState) -> RetrievalAction {
     // No evidence at all.
     if state.candidate_count == 0 {
         return RetrievalAction::BroadenSearch;
     }
 
     // Strong unresolved contradiction between evidence sources.
-    if state.support_strength >= 0.80
-        && state.contradiction_strength >= 0.80
-    {
+    if state.support_strength >= 0.80 && state.contradiction_strength >= 0.80 {
         return RetrievalAction::DiversifySources;
     }
 
     // Retrieved evidence is relevant but does not cover
     // enough of the claim.
-    if state.relevance_concentration >= 0.60
-        && state.claim_coverage < 0.50
-    {
+    if state.relevance_concentration >= 0.60 && state.claim_coverage < 0.50 {
         return RetrievalAction::SeekComplementaryEvidence;
     }
 
@@ -43,9 +34,7 @@ pub fn choose_action(
 
     // We have repeatedly searched without finding
     // much genuinely new information.
-    if state.iteration >= 3
-        && state.retrieval_novelty < 0.15
-    {
+    if state.iteration >= 3 && state.retrieval_novelty < 0.15 {
         return RetrievalAction::Abstain;
     }
 

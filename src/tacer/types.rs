@@ -29,7 +29,6 @@ pub struct TacerDecision {
     pub reason: String,
 }
 
-
 // ==================================================
 // TACER V2 — general adaptive retrieval controller
 // ==================================================
@@ -63,7 +62,6 @@ pub enum RetrievalAction {
     /// too uncertain to justify a commitment.
     Abstain,
 }
-
 
 #[derive(Debug, Clone)]
 pub struct EvidenceState {

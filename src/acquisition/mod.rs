@@ -5,17 +5,8 @@ pub mod search;
 
 pub use extract::extract_passages;
 pub use fetch::SourceFetcher;
-pub use rank::{
-    rank_passages,
-    relevance_concentration,
-    source_diversity,
-    ScoredEvidencePassage,
-};
-pub use search::{
-    SearchProvider,
-    SearchRequest,
-    TavilySearchProvider,
-};
+pub use rank::{ScoredEvidencePassage, rank_passages, relevance_concentration, source_diversity};
+pub use search::{SearchProvider, SearchRequest, TavilySearchProvider};
 
 #[derive(Debug, Clone)]
 pub struct SearchResult {

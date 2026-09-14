@@ -1,12 +1,8 @@
 use super::SearchResult;
 
 use reqwest::blocking::Client;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::{Deserialize, Serialize};
 use std::env;
-
 
 // ==================================================
 // Generic search interface
@@ -19,12 +15,8 @@ pub struct SearchRequest {
 }
 
 pub trait SearchProvider {
-    fn search(
-        &self,
-        request: &SearchRequest,
-    ) -> Result<Vec<SearchResult>, String>;
+    fn search(&self, request: &SearchRequest) -> Result<Vec<SearchResult>, String>;
 }
-
 
 // ==================================================
 // Tavily implementation
@@ -38,10 +30,7 @@ pub struct TavilySearchProvider {
 impl TavilySearchProvider {
     pub fn from_env() -> Result<Self, String> {
         let api_key = env::var("TAVILY_API_KEY")
-            .map_err(|_| {
-                "TAVILY_API_KEY environment variable is not set"
-                    .to_string()
-            })?;
+            .map_err(|_| "TAVILY_API_KEY environment variable is not set".to_string())?;
 
         Ok(Self {
             client: Client::new(),
@@ -49,7 +38,6 @@ impl TavilySearchProvider {
         })
     }
 }
-
 
 // --------------------------------------------------
 // Tavily request / response shapes
@@ -77,16 +65,12 @@ struct TavilyResult {
     content: String,
 }
 
-
 // ==================================================
 // SearchProvider implementation
 // ==================================================
 
 impl SearchProvider for TavilySearchProvider {
-    fn search(
-        &self,
-        request: &SearchRequest,
-    ) -> Result<Vec<SearchResult>, String> {
+    fn search(&self, request: &SearchRequest) -> Result<Vec<SearchResult>, String> {
         let body = TavilyRequest {
             api_key: &self.api_key,
             query: &request.query,
@@ -99,44 +83,28 @@ impl SearchProvider for TavilySearchProvider {
             .post("https://api.tavily.com/search")
             .json(&body)
             .send()
-            .map_err(|error| {
-                format!(
-                    "Tavily request failed: {}",
-                    error
-                )
-            })?;
+            .map_err(|error| format!("Tavily request failed: {}", error))?;
 
         if !response.status().is_success() {
-            return Err(format!(
-                "Tavily returned HTTP {}",
-                response.status()
-            ));
+            return Err(format!("Tavily returned HTTP {}", response.status()));
         }
 
-        let response: TavilyResponse =
-            response
-                .json()
-                .map_err(|error| {
-                    format!(
-                        "Could not parse Tavily response: {}",
-                        error
-                    )
-                })?;
+        let response: TavilyResponse = response
+            .json()
+            .map_err(|error| format!("Could not parse Tavily response: {}", error))?;
 
         let results = response
             .results
             .into_iter()
-            .map(|result| {
-                SearchResult {
-                    title: result.title,
-                    url: result.url,
-                    snippet: if result.content.is_empty() {
-                        None
-                    } else {
-                        Some(result.content)
-                    },
-                    source_name: None,
-                }
+            .map(|result| SearchResult {
+                title: result.title,
+                url: result.url,
+                snippet: if result.content.is_empty() {
+                    None
+                } else {
+                    Some(result.content)
+                },
+                source_name: None,
             })
             .collect();
 

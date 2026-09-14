@@ -1,29 +1,22 @@
+mod acquisition;
 mod alignment;
 mod bm25;
 mod decision;
-mod reranker;
 mod overlap;
+mod reranker;
 mod tacer;
-mod acquisition;
 
+use acquisition::{
+    SearchProvider, SearchRequest, SourceFetcher, TavilySearchProvider, extract_passages,
+    rank_passages, relevance_concentration, source_diversity,
+};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
 use tacer::choose_action;
-use tacer::types::EvidenceState;
-use acquisition::{
-    extract_passages,
-    rank_passages,
-    relevance_concentration,
-    source_diversity,
-    SearchProvider,
-    SearchRequest,
-    SourceFetcher,
-    TavilySearchProvider,
-};
-
+use tacer::types::{EvidenceState, RetrievalAction};
 
 #[derive(Deserialize)]
 struct Passage {
@@ -95,17 +88,12 @@ struct TacerInferenceResponse {
 // --------------------------------------------------
 
 fn load_documents() -> Vec<Document> {
-    let file = File::open(
-        "data/normalized/scifact/documents.jsonl"
-    )
-    .expect("Could not open documents");
+    let file =
+        File::open("data/normalized/scifact/documents.jsonl").expect("Could not open documents");
 
     BufReader::new(file)
         .lines()
-        .map(|line| {
-            serde_json::from_str(&line.unwrap())
-                .expect("Invalid document")
-        })
+        .map(|line| serde_json::from_str(&line.unwrap()).expect("Invalid document"))
         .collect()
 }
 
@@ -113,18 +101,10 @@ fn load_documents() -> Vec<Document> {
 // Batch verifier
 // --------------------------------------------------
 
-fn verify(
-    claim: &str,
-    evidence: Vec<&str>,
-) -> VerificationResponse {
-    let input = VerificationInput {
-        claim,
-        evidence,
-    };
+fn verify(claim: &str, evidence: Vec<&str>) -> VerificationResponse {
+    let input = VerificationInput { claim, evidence };
 
-    let json =
-        serde_json::to_string(&input)
-            .expect("Could not create verifier JSON");
+    let json = serde_json::to_string(&input).expect("Could not create verifier JSON");
 
     let mut child = Command::new("python")
         .arg("verifier/verify.py")
@@ -140,9 +120,7 @@ fn verify(
         .write_all(json.as_bytes())
         .expect("Could not send input to verifier");
 
-    let output = child
-        .wait_with_output()
-        .expect("Verifier failed");
+    let output = child.wait_with_output().expect("Verifier failed");
 
     if !output.status.success() {
         panic!(
@@ -151,10 +129,8 @@ fn verify(
         );
     }
 
-    serde_json::from_slice(&output.stdout)
-        .expect("Could not parse verifier result")
+    serde_json::from_slice(&output.stdout).expect("Could not parse verifier result")
 }
-
 
 fn infer_tacer<'a>(
     claim: &'a str,
@@ -164,29 +140,22 @@ fn infer_tacer<'a>(
     let input = TacerInput {
         claim,
 
-        retrieved_document_scores: documents
-            .iter()
-            .map(|(_, score)| *score)
-            .collect(),
+        retrieved_document_scores: documents.iter().map(|(_, score)| *score).collect(),
 
         candidates: candidates
             .iter()
             .enumerate()
             .map(|(index, candidate)| TacerCandidateInput {
-                document_id:
-                    candidate.document.document_id.as_str(),
+                document_id: candidate.document.document_id.as_str(),
 
-                passage_id:
-                    format!("runtime:{index}"),
+                passage_id: format!("runtime:{index}"),
 
-                text:
-                    candidate.passage.text.as_str(),
+                text: candidate.passage.text.as_str(),
             })
             .collect(),
     };
 
-    let json = serde_json::to_string(&input)
-        .expect("Could not create TACER JSON");
+    let json = serde_json::to_string(&input).expect("Could not create TACER JSON");
 
     let mut child = Command::new("python")
         .arg("src/tacer/infer.py")
@@ -202,9 +171,7 @@ fn infer_tacer<'a>(
         .write_all(json.as_bytes())
         .expect("Could not send TACER input");
 
-    let output = child
-        .wait_with_output()
-        .expect("TACER inference failed");
+    let output = child.wait_with_output().expect("TACER inference failed");
 
     if !output.status.success() {
         panic!(
@@ -213,8 +180,7 @@ fn infer_tacer<'a>(
         );
     }
 
-    serde_json::from_slice(&output.stdout)
-        .expect("Could not parse TACER result")
+    serde_json::from_slice(&output.stdout).expect("Could not parse TACER result")
 }
 
 fn select_top_alignment<'a>(
@@ -225,26 +191,15 @@ fn select_top_alignment<'a>(
     let mut ranked: Vec<_> = candidates
         .into_iter()
         .zip(inference.candidates.iter())
-        .map(|(candidate, scored)| {
-            (
-                candidate,
-                scored.alignment_score,
-            )
-        })
+        .map(|(candidate, scored)| (candidate, scored.alignment_score))
         .collect();
 
-    ranked.sort_by(|a, b| {
-        b.1.total_cmp(&a.1)
-    });
+    ranked.sort_by(|a, b| b.1.total_cmp(&a.1));
 
     ranked.truncate(limit);
 
-    ranked
-        .into_iter()
-        .map(|(candidate, _)| candidate)
-        .collect()
+    ranked.into_iter().map(|(candidate, _)| candidate).collect()
 }
-
 
 // --------------------------------------------------
 // CLI
@@ -265,10 +220,7 @@ struct Args {
 fn main() {
     let documents = load_documents();
 
-    println!(
-        "Loaded {} documents.",
-        documents.len()
-    );
+    println!("Loaded {} documents.", documents.len());
 
     let bm25 = bm25::BM25::new(documents);
 
@@ -282,27 +234,21 @@ fn main() {
     println!("\nONLINE EVIDENCE SEARCH");
 
     let search_provider =
-        TavilySearchProvider::from_env()
-            .expect("Could not initialize search provider");
+        TavilySearchProvider::from_env().expect("Could not initialize search provider");
 
     let search_request = SearchRequest {
         query: claim.clone(),
         limit: 5,
     };
 
-    let search_results =
-        search_provider
-            .search(&search_request)
-            .expect("Online evidence search failed");
+    let search_results = search_provider
+        .search(&search_request)
+        .expect("Online evidence search failed");
 
     for (index, result) in search_results.iter().enumerate() {
         println!("\n--------------------------------");
 
-        println!(
-            "{}. {}",
-            index + 1,
-            result.title
-        );
+        println!("{}. {}", index + 1, result.title);
 
         println!("URL: {}", result.url);
 
@@ -319,9 +265,7 @@ fn main() {
     println!("ONLINE EVIDENCE ACQUISITION");
     println!("================================");
 
-    let fetcher =
-        SourceFetcher::new()
-            .expect("Could not initialize source fetcher");
+    let fetcher = SourceFetcher::new().expect("Could not initialize source fetcher");
 
     let mut online_passages = Vec::new();
 
@@ -332,35 +276,23 @@ fn main() {
 
         match fetcher.fetch(result) {
             Ok(document) => {
-                println!(
-                    "Content type: {:?}",
-                    document.content_type
-                );
+                println!("Content type: {:?}", document.content_type);
 
                 match extract_passages(&document) {
                     Ok(passages) => {
-                        println!(
-                            "Extracted passages: {}",
-                            passages.len()
-                        );
+                        println!("Extracted passages: {}", passages.len());
 
                         online_passages.extend(passages);
                     }
 
                     Err(error) => {
-                        println!(
-                            "Extraction skipped: {}",
-                            error
-                        );
+                        println!("Extraction skipped: {}", error);
                     }
                 }
             }
 
             Err(error) => {
-                println!(
-                    "Fetch failed: {}",
-                    error
-                );
+                println!("Fetch failed: {}", error);
             }
         }
     }
@@ -375,47 +307,20 @@ fn main() {
     println!("================================");
 
     let ranked_online_passages =
-        rank_passages(
-            &claim,
-            &online_passages,
-        )
-        .expect(
-            "Could not rank online evidence"
-        );
+        rank_passages(&claim, &online_passages).expect("Could not rank online evidence");
 
-    println!(
-        "Scored passages: {}",
-        ranked_online_passages.len()
-    );
+    println!("Scored passages: {}", ranked_online_passages.len());
 
-    for (index, scored) in
-        ranked_online_passages
-            .iter()
-            .take(10)
-            .enumerate()
-    {
+    for (index, scored) in ranked_online_passages.iter().take(10).enumerate() {
         println!("\n--------------------------------");
 
-        println!(
-            "{}. relevance={:.4}",
-            index + 1,
-            scored.relevance_score
-        );
+        println!("{}. relevance={:.4}", index + 1, scored.relevance_score);
 
-        println!(
-            "Source: {}",
-            scored.passage.source_title
-        );
+        println!("Source: {}", scored.passage.source_title);
 
-        println!(
-            "URL: {}",
-            scored.passage.source_url
-        );
+        println!("URL: {}", scored.passage.source_url);
 
-        println!(
-            "{}",
-            scored.passage.text
-        );
+        println!("{}", scored.passage.text);
     }
 
     println!("\nCLAIM");
@@ -425,72 +330,43 @@ fn main() {
     println!("ONLINE TACER STATE");
     println!("================================");
 
-    let positive_passages: Vec<&str> =
-        ranked_online_passages
-            .iter()
-            .filter(|passage| {
-                passage.relevance_score > 0.0
-            })
-            .map(|passage| {
-                passage.passage.text.as_str()
-            })
-            .collect();
+    let positive_passages: Vec<&str> = ranked_online_passages
+        .iter()
+        .filter(|passage| passage.relevance_score > 0.0)
+        .map(|passage| passage.passage.text.as_str())
+        .collect();
 
-    let coverage =
-        overlap::claim_coverage(
-            &claim,
-            positive_passages,
-        );
+    let coverage = overlap::claim_coverage(&claim, positive_passages);
 
-    let concentration =
-        relevance_concentration(
-            &ranked_online_passages,
-        );
+    let concentration = relevance_concentration(&ranked_online_passages);
 
-    let diversity =
-        source_diversity(
-            &ranked_online_passages,
-        );
+    let diversity = source_diversity(&ranked_online_passages);
 
     let online_state = EvidenceState {
-        candidate_count:
-            ranked_online_passages.len(),
+        candidate_count: ranked_online_passages.len(),
 
-        relevance_concentration:
-            concentration,
+        relevance_concentration: concentration,
 
-        claim_coverage:
-            coverage,
+        claim_coverage: coverage,
 
-        ranker_agreement:
-            f64::NAN,
+        ranker_agreement: f64::NAN,
 
-        source_diversity:
-            diversity,
+        source_diversity: diversity,
 
-        source_quality:
-            f64::NAN,
+        source_quality: f64::NAN,
 
-        support_strength:
-            f64::NAN,
+        support_strength: f64::NAN,
 
-        contradiction_strength:
-            f64::NAN,
+        contradiction_strength: f64::NAN,
 
-        evidence_conflict:
-            f64::NAN,
+        evidence_conflict: f64::NAN,
 
-        retrieval_novelty:
-            f64::NAN,
+        retrieval_novelty: f64::NAN,
 
-        iteration:
-            0,
+        iteration: 0,
     };
 
-    println!(
-        "Candidates:              {}",
-        online_state.candidate_count
-    );
+    println!("Candidates:              {}", online_state.candidate_count);
 
     println!(
         "Relevance concentration: {:.3}",
@@ -507,13 +383,168 @@ fn main() {
         online_state.source_diversity
     );
 
-    let online_action =
-        choose_action(&online_state);
+    let online_action = choose_action(&online_state);
 
-    println!(
-        "TACER action:             {:?}",
-        online_action
-    );
+    println!("TACER action:             {:?}", online_action);
+
+    if online_action == RetrievalAction::DiversifySources {
+        println!("\n================================");
+        println!("TACER: DIVERSIFY SOURCES");
+        println!("================================");
+
+        let diversified_query = format!(
+            "{} review evidence alternative sources independent studies",
+            claim
+        );
+
+        println!("Diversified query: {}", diversified_query);
+
+        let diversified_request = SearchRequest {
+            query: diversified_query,
+            limit: 5,
+        };
+
+        let diversified_results = search_provider
+            .search(&diversified_request)
+            .expect("Diversified search failed");
+
+        let existing_urls: std::collections::HashSet<&str> = search_results
+            .iter()
+            .map(|result| result.url.as_str())
+            .collect();
+
+        let new_results: Vec<_> = diversified_results
+            .into_iter()
+            .filter(|result| !existing_urls.contains(result.url.as_str()))
+            .collect();
+
+        println!("New diversified sources: {}", new_results.len());
+
+        for (index, result) in new_results.iter().enumerate() {
+            println!("\n--------------------------------");
+
+            println!("{}. {}", index + 1, result.title);
+
+            println!("URL: {}", result.url);
+        }
+        println!("\n================================");
+        println!("DIVERSIFIED EVIDENCE ACQUISITION");
+        println!("================================");
+
+        let mut diversified_passages = Vec::new();
+
+        for result in &new_results {
+            println!("\n--------------------------------");
+            println!("Source: {}", result.title);
+            println!("URL: {}", result.url);
+
+            match fetcher.fetch(result) {
+                Ok(document) => match extract_passages(&document) {
+                    Ok(passages) => {
+                        println!("Extracted passages: {}", passages.len());
+
+                        diversified_passages.extend(passages);
+                    }
+
+                    Err(error) => {
+                        println!("Extraction failed: {}", error);
+                    }
+                },
+
+                Err(error) => {
+                    println!("Fetch failed: {}", error);
+                }
+            }
+        }
+
+        println!(
+            "\nNew diversified evidence passages: {}",
+            diversified_passages.len()
+        );
+
+        online_passages.extend(diversified_passages);
+
+        println!(
+            "Total evidence passages after diversification: {}",
+            online_passages.len()
+        );
+
+        println!("\n================================");
+        println!("ONLINE EVIDENCE RERANKING — ITERATION 1");
+        println!("================================");
+
+        let reranked_after_diversification =
+            rank_passages(&claim, &online_passages).expect("Could not rerank diversified evidence");
+
+        let positive_passages_after_diversification: Vec<&str> = reranked_after_diversification
+            .iter()
+            .filter(|passage| passage.relevance_score > 0.0)
+            .map(|passage| passage.passage.text.as_str())
+            .collect();
+
+        let coverage_after_diversification =
+            overlap::claim_coverage(&claim, positive_passages_after_diversification);
+
+        let concentration_after_diversification =
+            relevance_concentration(&reranked_after_diversification);
+
+        let diversity_after_diversification = source_diversity(&reranked_after_diversification);
+
+        let state_after_diversification = EvidenceState {
+            candidate_count: reranked_after_diversification.len(),
+
+            relevance_concentration: concentration_after_diversification,
+
+            claim_coverage: coverage_after_diversification,
+
+            ranker_agreement: f64::NAN,
+
+            source_diversity: diversity_after_diversification,
+
+            source_quality: f64::NAN,
+
+            support_strength: f64::NAN,
+
+            contradiction_strength: f64::NAN,
+
+            evidence_conflict: f64::NAN,
+
+            retrieval_novelty: f64::NAN,
+
+            iteration: 1,
+        };
+
+        println!("\n================================");
+        println!("ONLINE TACER STATE — ITERATION 1");
+        println!("================================");
+
+        println!(
+            "Candidates:              {}",
+            state_after_diversification.candidate_count
+        );
+
+        println!(
+            "Relevance concentration: {:.3}",
+            state_after_diversification.relevance_concentration
+        );
+
+        println!(
+            "Claim coverage:           {:.3}",
+            state_after_diversification.claim_coverage
+        );
+
+        println!(
+            "Source diversity:         {:.3}",
+            state_after_diversification.source_diversity
+        );
+
+        let action_after_diversification = choose_action(&state_after_diversification);
+
+        println!(
+            "TACER action:             {:?}",
+            action_after_diversification
+        );
+    }
 
     // --------------------------------------------------
     // Document retrieval
@@ -523,9 +554,7 @@ fn main() {
 
     println!("\nRETRIEVED DOCUMENTS");
 
-    for (rank, (document, score))
-        in documents.iter().enumerate()
-    {
+    for (rank, (document, score)) in documents.iter().enumerate() {
         println!(
             "{}. {} | {:.3} | {}",
             rank + 1,
@@ -535,21 +564,13 @@ fn main() {
         );
     }
 
-    
-
     // --------------------------------------------------
     // Learned TACER-A inference
     // --------------------------------------------------
 
-    let tacer_candidates =
-        bm25.all_passages(&documents);
+    let tacer_candidates = bm25.all_passages(&documents);
 
-    let tacer_inference =
-        infer_tacer(
-            &claim,
-            &documents,
-            &tacer_candidates,
-        );
+    let tacer_inference = infer_tacer(&claim, &documents, &tacer_candidates);
 
     println!("\n================================");
     println!("TACER-A");
@@ -560,45 +581,25 @@ fn main() {
         tacer_inference.probability_sufficient
     );
 
-    let tacer_route =
-    tacer::route_initial(
-        tacer_inference.probability_sufficient
-    );
+    let tacer_route = tacer::route_initial(tacer_inference.probability_sufficient);
 
-    println!(
-        "Route: {:?}",
-        tacer_route
-    );
+    println!("Route: {:?}", tacer_route);
 
-    println!(
-        "Candidates evaluated: {}",
-        tacer_inference.candidates.len()
-    );
+    println!("Candidates evaluated: {}", tacer_inference.candidates.len());
 
-    let final_passages =
-    
-    if tacer_route == tacer::EvidenceRoute::Expanded {
+    let final_passages = if tacer_route == tacer::EvidenceRoute::Expanded {
         println!("\n================================");
         println!("TACER-A EXPANSION");
         println!("================================");
 
-        let expanded_documents =
-            bm25.search(&claim, 20);
+        let expanded_documents = bm25.search(&claim, 20);
 
-        println!(
-            "Expanded retrieval depth: {}",
-            expanded_documents.len()
-        );
+        println!("Expanded retrieval depth: {}", expanded_documents.len());
 
-        let expanded_candidates =
-            bm25.all_passages(&expanded_documents);
+        let expanded_candidates = bm25.all_passages(&expanded_documents);
 
         let expanded_tacer_inference =
-            infer_tacer(
-                &claim,
-                &expanded_documents,
-                &expanded_candidates,
-            );
+            infer_tacer(&claim, &expanded_documents, &expanded_candidates);
 
         println!(
             "Expanded P(sufficient): {:.6}",
@@ -610,46 +611,27 @@ fn main() {
             expanded_tacer_inference.candidates.len()
         );
 
-        select_top_alignment(
-            expanded_candidates,
-            &expanded_tacer_inference,
-            5,
-        )
+        select_top_alignment(expanded_candidates, &expanded_tacer_inference, 5)
     } else {
-        select_top_alignment(
-            tacer_candidates,
-            &tacer_inference,
-            5,
-        )
+        select_top_alignment(tacer_candidates, &tacer_inference, 5)
     };
 
     // --------------------------------------------------
     // Semantic reranking
     // --------------------------------------------------
 
-    let reranked =
-        reranker::rerank(&claim, &final_passages);
+    let reranked = reranker::rerank(&claim, &final_passages);
 
     println!("\nRERANKED EVIDENCE");
 
     for (rank, item) in reranked.iter().enumerate() {
         println!("\n--------------------------------");
 
-        println!(
-            "{}. relevance={:.3}",
-            rank + 1,
-            item.relevance_score
-        );
+        println!("{}. relevance={:.3}", rank + 1, item.relevance_score);
 
-        println!(
-            "Document: {}",
-            item.candidate.document.title
-        );
+        println!("Document: {}", item.candidate.document.title);
 
-        println!(
-            "{}",
-            item.candidate.passage.text
-        );
+        println!("{}", item.candidate.passage.text);
     }
 
     // --------------------------------------------------
@@ -662,13 +644,9 @@ fn main() {
     // final decision.
     // --------------------------------------------------
 
-    let retrieval_scores: Vec<f64> = reranked
-        .iter()
-        .map(|item| item.relevance_score)
-        .collect();
+    let retrieval_scores: Vec<f64> = reranked.iter().map(|item| item.relevance_score).collect();
 
-    let retrieval_state =
-        tacer::retrieval_signals(&retrieval_scores);
+    let retrieval_state = tacer::retrieval_signals(&retrieval_scores);
 
     println!("\n================================");
     println!("TACER EVIDENCE STATE");
@@ -676,60 +654,27 @@ fn main() {
 
     println!("\nRETRIEVAL CONCENTRATION");
 
-    println!(
-        "Top score:          {:.3}",
-        retrieval_state.top_score
-    );
+    println!("Top score:          {:.3}", retrieval_state.top_score);
 
-    println!(
-        "Mean score:         {:.3}",
-        retrieval_state.mean_score
-    );
+    println!("Mean score:         {:.3}", retrieval_state.mean_score);
 
-    println!(
-        "Score std:          {:.3}",
-        retrieval_state.score_std
-    );
+    println!("Score std:          {:.3}", retrieval_state.score_std);
 
-    println!(
-        "Gap 1→2:            {:.3}",
-        retrieval_state.gap_1_2
-    );
+    println!("Gap 1→2:            {:.3}", retrieval_state.gap_1_2);
 
-    println!(
-        "Gap 1→5:            {:.3}",
-        retrieval_state.gap_1_5
-    );
+    println!("Gap 1→5:            {:.3}", retrieval_state.gap_1_5);
 
-    println!(
-        "Top-1 mass:         {:.3}",
-        retrieval_state.top1_mass
-    );
+    println!("Top-1 mass:         {:.3}", retrieval_state.top1_mass);
 
-    println!(
-        "Top-3 mass:         {:.3}",
-        retrieval_state.top3_mass
-    );
+    println!("Top-3 mass:         {:.3}", retrieval_state.top3_mass);
 
-    println!(
-        "Top-5 mass:         {:.3}",
-        retrieval_state.top5_mass
-    );
+    println!("Top-5 mass:         {:.3}", retrieval_state.top5_mass);
 
-    println!(
-        "Top1 / Top5:        {:.3}",
-        retrieval_state.top1_to_top5
-    );
+    println!("Top1 / Top5:        {:.3}", retrieval_state.top1_to_top5);
 
-    println!(
-        "Top3 / Top8 mass:   {:.3}",
-        retrieval_state.top3_to_top8
-    );
+    println!("Top3 / Top8 mass:   {:.3}", retrieval_state.top3_to_top8);
 
-    println!(
-        "Entropy:            {:.3}",
-        retrieval_state.entropy
-    );
+    println!("Entropy:            {:.3}", retrieval_state.entropy);
 
     println!(
         "Normalized entropy: {:.3}",
@@ -743,67 +688,29 @@ fn main() {
     println!("\nEVIDENCE COVERAGE");
 
     for (index, item) in reranked.iter().enumerate() {
-        let coverage = tacer::coverage_signals(
-            &claim,
-            &item.candidate.passage.text,
-            index,
-        );
-        let alignment = alignment::alignment_signals(
-            &claim,
-            &item.candidate.passage.text,
-        );
+        let coverage = tacer::coverage_signals(&claim, &item.candidate.passage.text, index);
+        let alignment = alignment::alignment_signals(&claim, &item.candidate.passage.text);
 
         println!("\n--------------------------------");
 
-        println!(
-            "{}. {}",
-            index + 1,
-            item.candidate.document.document_id
-        );
+        println!("{}. {}", index + 1, item.candidate.document.document_id);
 
-        println!(
-            "Document: {}",
-            item.candidate.document.title
-        );
+        println!("Document: {}", item.candidate.document.title);
 
-        println!(
-            "Exact overlap:  {:.3}",
-            coverage.exact_overlap
-        );
+        println!("Exact overlap:  {:.3}", coverage.exact_overlap);
 
-        println!(
-            "Rare overlap:   {:.3}",
-            coverage.rare_overlap
-        );
+        println!("Rare overlap:   {:.3}", coverage.rare_overlap);
 
-        println!(
-            "Phrase overlap: {:.3}",
-            coverage.phrase_overlap
-        );
+        println!("Phrase overlap: {:.3}", coverage.phrase_overlap);
 
-        println!(
-            "Density:        {:.3}",
-            coverage.density
-        );
+        println!("Density:        {:.3}", coverage.density);
 
-        println!(
-            "Position bonus: {:.3}",
-            coverage.position_bonus
-        );
+        println!("Position bonus: {:.3}", coverage.position_bonus);
 
-        println!(
-            "TACER score:    {:.3}",
-            coverage.evidence_score
-        );
-        println!(
-            "Anchor coverage: {:.3}",
-            alignment.anchor_coverage
-        );
+        println!("TACER score:    {:.3}", coverage.evidence_score);
+        println!("Anchor coverage: {:.3}", alignment.anchor_coverage);
 
-        println!(
-            "Entity coverage: {:.3}",
-            alignment.entity_coverage
-        );
+        println!("Entity coverage: {:.3}", alignment.entity_coverage);
 
         println!(
             "Primary anchor:  {}",
@@ -814,14 +721,8 @@ fn main() {
             }
         );
 
-        println!(
-            "Alignment score: {:.3}",
-            alignment.alignment_score
-        );
-        println!(
-            "{}",
-            item.candidate.passage.text
-        );
+        println!("Alignment score: {:.3}", alignment.alignment_score);
+        println!("{}", item.candidate.passage.text);
     }
 
     // --------------------------------------------------
@@ -835,18 +736,15 @@ fn main() {
     // --------------------------------------------------
 
     let evidence: Vec<&str> = final_passages
-    .iter()
-    .map(|candidate| {
-        candidate.passage.text.as_str()
-    })
-    .collect();
+        .iter()
+        .map(|candidate| candidate.passage.text.as_str())
+        .collect();
 
     // --------------------------------------------------
     // Batch verification
     // --------------------------------------------------
 
-    let verification =
-        verify(&claim, evidence);
+    let verification = verify(&claim, evidence);
 
     // --------------------------------------------------
     // Display evidence + verification
@@ -861,54 +759,31 @@ fn main() {
     {
         println!("\n--------------------------------");
 
-        println!(
-            "{}. {}",
-            index + 1,
-            candidate.document.document_id
-        );
+        println!("{}. {}", index + 1, candidate.document.document_id);
 
-        println!(
-            "Document: {}",
-            candidate.document.title
-        );
+        println!("Document: {}", candidate.document.title);
 
         println!(
             "Scores: document={:.3} passage={:.3} combined={:.3}",
-            candidate.document_score,
-            candidate.passage_score,
-            candidate.combined_score
+            candidate.document_score, candidate.passage_score, candidate.combined_score
         );
 
-        println!(
-            "{}",
-            candidate.passage.text
-        );
+        println!("{}", candidate.passage.text);
 
-        println!(
-            "→ {} ({:.3})",
-            result.label,
-            result.confidence
-        );
+        println!("→ {} ({:.3})", result.label, result.confidence);
     }
 
     // --------------------------------------------------
     // AuditGate decision
     // --------------------------------------------------
 
-    let audit_decision =
-        decision::decide(&verification.results);
+    let audit_decision = decision::decide(&verification.results);
 
     println!("\n================================");
     println!("AUDITGATE DECISION");
     println!("================================");
 
-    println!(
-        "Decision: {}",
-        audit_decision.decision
-    );
+    println!("Decision: {}", audit_decision.decision);
 
-    println!(
-        "Reason: {}",
-        audit_decision.reason
-    );
+    println!("Reason: {}", audit_decision.reason);
 }

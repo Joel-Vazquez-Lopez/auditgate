@@ -9,9 +9,7 @@ pub const TACER_A_THRESHOLD: f64 = 0.55;
 /// This function deliberately does not compute
 /// P(sufficient). The probability must come from
 /// the trained TACER-A model.
-pub fn route_initial(
-    probability_sufficient: f64,
-) -> EvidenceRoute {
+pub fn route_initial(probability_sufficient: f64) -> EvidenceRoute {
     if probability_sufficient >= TACER_A_THRESHOLD {
         EvidenceRoute::Compact
     } else {
@@ -28,9 +26,7 @@ pub fn route_initial(
 /// For now, the caller supplies whether expansion produced
 /// a credible resolved evidence state. Later this can be
 /// replaced by a learned multi-depth controller.
-pub fn route_after_expansion(
-    resolved: bool,
-) -> EvidenceRoute {
+pub fn route_after_expansion(resolved: bool) -> EvidenceRoute {
     if resolved {
         EvidenceRoute::Expanded
     } else {
@@ -44,41 +40,26 @@ mod tests {
 
     #[test]
     fn sufficient_initial_state_stays_compact() {
-        assert_eq!(
-            route_initial(0.80),
-            EvidenceRoute::Compact
-        );
+        assert_eq!(route_initial(0.80), EvidenceRoute::Compact);
     }
 
     #[test]
     fn insufficient_initial_state_expands() {
-        assert_eq!(
-            route_initial(0.20),
-            EvidenceRoute::Expanded
-        );
+        assert_eq!(route_initial(0.20), EvidenceRoute::Expanded);
     }
 
     #[test]
     fn threshold_is_inclusive() {
-        assert_eq!(
-            route_initial(TACER_A_THRESHOLD),
-            EvidenceRoute::Compact
-        );
+        assert_eq!(route_initial(TACER_A_THRESHOLD), EvidenceRoute::Compact);
     }
 
     #[test]
     fn unresolved_expansion_acquires_more() {
-        assert_eq!(
-            route_after_expansion(false),
-            EvidenceRoute::AcquireMore
-        );
+        assert_eq!(route_after_expansion(false), EvidenceRoute::AcquireMore);
     }
 
     #[test]
     fn resolved_expansion_continues() {
-        assert_eq!(
-            route_after_expansion(true),
-            EvidenceRoute::Expanded
-        );
+        assert_eq!(route_after_expansion(true), EvidenceRoute::Expanded);
     }
 }
