@@ -15,8 +15,8 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
-use tacer::choose_action;
-use tacer::types::{EvidenceState, RetrievalAction};
+use tacer::types::RetrievalAction;
+use tacer::{build_evidence_state, choose_action};
 
 #[derive(Deserialize)]
 struct Passage {
@@ -245,17 +245,7 @@ fn main() {
         .search(&search_request)
         .expect("Online evidence search failed");
 
-    for (index, result) in search_results.iter().enumerate() {
-        println!("\n--------------------------------");
-
-        println!("{}. {}", index + 1, result.title);
-
-        println!("URL: {}", result.url);
-
-        if let Some(snippet) = &result.snippet {
-            println!("Discovery text: {}", snippet);
-        }
-    }
+    println!("Sources found: {}", search_results.len());
 
     // --------------------------------------------------
     // Fetch and extract real source evidence
@@ -270,26 +260,16 @@ fn main() {
     let mut online_passages = Vec::new();
 
     for result in &search_results {
-        println!("\n--------------------------------");
-        println!("Source: {}", result.title);
-        println!("URL: {}", result.url);
-
         match fetcher.fetch(result) {
-            Ok(document) => {
-                println!("Content type: {:?}", document.content_type);
-
-                match extract_passages(&document) {
-                    Ok(passages) => {
-                        println!("Extracted passages: {}", passages.len());
-
-                        online_passages.extend(passages);
-                    }
-
-                    Err(error) => {
-                        println!("Extraction skipped: {}", error);
-                    }
+            Ok(document) => match extract_passages(&document) {
+                Ok(passages) => {
+                    online_passages.extend(passages);
                 }
-            }
+
+                Err(error) => {
+                    println!("Extraction skipped: {}", error);
+                }
+            },
 
             Err(error) => {
                 println!("Fetch failed: {}", error);
@@ -311,60 +291,9 @@ fn main() {
 
     println!("Scored passages: {}", ranked_online_passages.len());
 
-    for (index, scored) in ranked_online_passages.iter().take(10).enumerate() {
-        println!("\n--------------------------------");
+    println!("\nTACER — ITERATION 0");
 
-        println!("{}. relevance={:.4}", index + 1, scored.relevance_score);
-
-        println!("Source: {}", scored.passage.source_title);
-
-        println!("URL: {}", scored.passage.source_url);
-
-        println!("{}", scored.passage.text);
-    }
-
-    println!("\nCLAIM");
-    println!("{claim}");
-
-    println!("\n================================");
-    println!("ONLINE TACER STATE");
-    println!("================================");
-
-    let positive_passages: Vec<&str> = ranked_online_passages
-        .iter()
-        .filter(|passage| passage.relevance_score > 0.0)
-        .map(|passage| passage.passage.text.as_str())
-        .collect();
-
-    let coverage = overlap::claim_coverage(&claim, positive_passages);
-
-    let concentration = relevance_concentration(&ranked_online_passages);
-
-    let diversity = source_diversity(&ranked_online_passages);
-
-    let online_state = EvidenceState {
-        candidate_count: ranked_online_passages.len(),
-
-        relevance_concentration: concentration,
-
-        claim_coverage: coverage,
-
-        ranker_agreement: f64::NAN,
-
-        source_diversity: diversity,
-
-        source_quality: f64::NAN,
-
-        support_strength: f64::NAN,
-
-        contradiction_strength: f64::NAN,
-
-        evidence_conflict: f64::NAN,
-
-        retrieval_novelty: f64::NAN,
-
-        iteration: 0,
-    };
+    let online_state = build_evidence_state(&claim, &ranked_online_passages, 0);
 
     println!("Candidates:              {}", online_state.candidate_count);
 
@@ -388,9 +317,7 @@ fn main() {
     println!("TACER action:             {:?}", online_action);
 
     if online_action == RetrievalAction::DiversifySources {
-        println!("\n================================");
-        println!("TACER: DIVERSIFY SOURCES");
-        println!("================================");
+        println!("\nDIVERSIFY SOURCES");
 
         let diversified_query = format!(
             "{} review evidence alternative sources independent studies",
@@ -420,29 +347,14 @@ fn main() {
 
         println!("New diversified sources: {}", new_results.len());
 
-        for (index, result) in new_results.iter().enumerate() {
-            println!("\n--------------------------------");
-
-            println!("{}. {}", index + 1, result.title);
-
-            println!("URL: {}", result.url);
-        }
-        println!("\n================================");
-        println!("DIVERSIFIED EVIDENCE ACQUISITION");
-        println!("================================");
+        println!("\nDIVERSIFIED EVIDENCE ACQUISITION");
 
         let mut diversified_passages = Vec::new();
 
         for result in &new_results {
-            println!("\n--------------------------------");
-            println!("Source: {}", result.title);
-            println!("URL: {}", result.url);
-
             match fetcher.fetch(result) {
                 Ok(document) => match extract_passages(&document) {
                     Ok(passages) => {
-                        println!("Extracted passages: {}", passages.len());
-
                         diversified_passages.extend(passages);
                     }
 
@@ -469,54 +381,15 @@ fn main() {
             online_passages.len()
         );
 
-        println!("\n================================");
-        println!("ONLINE EVIDENCE RERANKING — ITERATION 1");
-        println!("================================");
+        println!("\nEVIDENCE RERANKING — ITERATION 1");
 
         let reranked_after_diversification =
             rank_passages(&claim, &online_passages).expect("Could not rerank diversified evidence");
 
-        let positive_passages_after_diversification: Vec<&str> = reranked_after_diversification
-            .iter()
-            .filter(|passage| passage.relevance_score > 0.0)
-            .map(|passage| passage.passage.text.as_str())
-            .collect();
+        let state_after_diversification =
+            build_evidence_state(&claim, &reranked_after_diversification, 1);
 
-        let coverage_after_diversification =
-            overlap::claim_coverage(&claim, positive_passages_after_diversification);
-
-        let concentration_after_diversification =
-            relevance_concentration(&reranked_after_diversification);
-
-        let diversity_after_diversification = source_diversity(&reranked_after_diversification);
-
-        let state_after_diversification = EvidenceState {
-            candidate_count: reranked_after_diversification.len(),
-
-            relevance_concentration: concentration_after_diversification,
-
-            claim_coverage: coverage_after_diversification,
-
-            ranker_agreement: f64::NAN,
-
-            source_diversity: diversity_after_diversification,
-
-            source_quality: f64::NAN,
-
-            support_strength: f64::NAN,
-
-            contradiction_strength: f64::NAN,
-
-            evidence_conflict: f64::NAN,
-
-            retrieval_novelty: f64::NAN,
-
-            iteration: 1,
-        };
-
-        println!("\n================================");
-        println!("ONLINE TACER STATE — ITERATION 1");
-        println!("================================");
+        println!("\nTACER — ITERATION 1");
 
         println!(
             "Candidates:              {}",
