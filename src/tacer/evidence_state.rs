@@ -5,6 +5,7 @@ use crate::tacer::types::EvidenceState;
 pub fn build_evidence_state(
     claim: &str,
     passages: &[ScoredEvidencePassage],
+    retrieval_novelty: f64,
     iteration: usize,
 ) -> EvidenceState {
     let positive_passages: Vec<&str> = passages
@@ -32,7 +33,7 @@ pub fn build_evidence_state(
         contradiction_strength: f64::NAN,
         evidence_conflict: f64::NAN,
 
-        retrieval_novelty: f64::NAN,
+        retrieval_novelty,
         iteration,
     }
 }

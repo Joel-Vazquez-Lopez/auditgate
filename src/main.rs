@@ -71,6 +71,30 @@ fn verify(claim: &str, evidence: Vec<&str>) -> VerificationResponse {
 }
 
 // --------------------------------------------------
+// Acquisition failure logging
+// --------------------------------------------------
+
+fn log_acquisition_failure(url: &str, title: &str, error: &str, iteration: usize, action: &str) {
+    std::fs::create_dir_all("results").expect("Could not create results directory");
+
+    let failure = serde_json::json!({
+        "url": url,
+        "title": title,
+        "error": error,
+        "iteration": iteration,
+        "action": action,
+    });
+
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("results/acquisition_failures.jsonl")
+        .expect("Could not open acquisition failure log");
+
+    writeln!(file, "{}", failure).expect("Could not write acquisition failure");
+}
+
+// --------------------------------------------------
 // CLI
 // --------------------------------------------------
 
@@ -136,6 +160,8 @@ fn main() {
 
             Err(error) => {
                 println!("Fetch failed: {}", error);
+
+                log_acquisition_failure(&result.url, &result.title, &error, 0, "InitialSearch");
             }
         }
     }
@@ -158,11 +184,13 @@ fn main() {
 
     let mut final_online_passages = ranked_online_passages;
     let mut iteration = 0;
+    let mut retrieval_novelty = 1.0;
 
     loop {
         println!("\nTACER — ITERATION {}", iteration);
 
-        let state = build_evidence_state(&claim, &final_online_passages, iteration);
+        let state =
+            build_evidence_state(&claim, &final_online_passages, retrieval_novelty, iteration);
 
         println!("Candidates:              {}", state.candidate_count);
 
@@ -175,38 +203,78 @@ fn main() {
 
         println!("Source diversity:         {:.3}", state.source_diversity);
 
+        println!("Retrieval novelty:        {:.3}", state.retrieval_novelty);
+
         let action = choose_action(&state);
 
         println!("TACER action:             {:?}", action);
+
+        if action == RetrievalAction::Abstain {
+            println!("TACER stopping: further evidence acquisition has diminishing returns.");
+            break;
+        }
 
         if iteration >= MAX_TACER_ITERATIONS - 1 {
             println!("TACER stopping: maximum acquisition iterations reached.");
             break;
         }
 
-        if action != RetrievalAction::DiversifySources {
+        if action != RetrievalAction::DiversifySources
+            && action != RetrievalAction::ReformulateQuery
+            && action != RetrievalAction::SeekComplementaryEvidence
+        {
             println!(
                 "TACER stopping: action {:?} is not yet implemented.",
                 action
             );
             break;
         }
-
         // --------------------------------------------------
         // Diversify sources
         // --------------------------------------------------
 
-        println!("\nDIVERSIFY SOURCES");
+        match action {
+            RetrievalAction::DiversifySources => {
+                println!("\nDIVERSIFY SOURCES");
+            }
 
-        let diversified_query = format!(
-            "{} review evidence alternative sources independent studies",
-            claim
-        );
+            RetrievalAction::ReformulateQuery => {
+                println!("\nREFORMULATE QUERY");
+            }
 
-        println!("Diversified query: {}", diversified_query);
+            RetrievalAction::SeekComplementaryEvidence => {
+                println!("\nSEEK COMPLEMENTARY EVIDENCE");
+            }
+
+            _ => unreachable!(),
+        }
+
+        let acquisition_query = match action {
+            RetrievalAction::DiversifySources => {
+                format!(
+                    "{} review evidence alternative sources independent studies",
+                    claim
+                )
+            }
+
+            RetrievalAction::ReformulateQuery => {
+                format!("{} facts evidence explanation", claim)
+            }
+
+            RetrievalAction::SeekComplementaryEvidence => {
+                format!(
+                    "{} mechanism details missing evidence specific relationship",
+                    claim
+                )
+            }
+
+            _ => unreachable!(),
+        };
+
+        println!("Acquisition query: {}", acquisition_query);
 
         let diversified_request = SearchRequest {
-            query: diversified_query,
+            query: acquisition_query,
             limit: 5,
         };
 
@@ -249,6 +317,14 @@ fn main() {
 
                 Err(error) => {
                     println!("Fetch failed: {}", error);
+
+                    log_acquisition_failure(
+                        &result.url,
+                        &result.title,
+                        &error,
+                        iteration + 1,
+                        &format!("{:?}", action),
+                    );
                 }
             }
         }
@@ -259,13 +335,22 @@ fn main() {
         );
 
         if diversified_passages.is_empty() {
-            println!("TACER stopping: no new evidence passages were extracted.");
-            break;
+            retrieval_novelty = 0.0;
+            iteration += 1;
+
+            println!("Retrieval novelty:       {:.3}", retrieval_novelty);
+            continue;
         }
+
+        let new_passage_count = diversified_passages.len();
 
         online_passages.extend(diversified_passages);
 
+        retrieval_novelty = new_passage_count as f64 / online_passages.len() as f64;
+
         println!("Total evidence passages: {}", online_passages.len());
+
+        println!("Retrieval novelty:       {:.3}", retrieval_novelty);
 
         iteration += 1;
 

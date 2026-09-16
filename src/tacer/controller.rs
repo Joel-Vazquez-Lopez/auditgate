@@ -27,15 +27,14 @@ pub fn choose_action(state: &EvidenceState) -> RetrievalAction {
         return RetrievalAction::Refine;
     }
 
+    // Further acquisition is producing diminishing returns.
+    if state.iteration >= 1 && state.retrieval_novelty < 0.15 {
+        return RetrievalAction::Abstain;
+    }
+
     // Evidence comes from too narrow a source pool.
     if state.source_diversity < 0.30 {
         return RetrievalAction::DiversifySources;
-    }
-
-    // We have repeatedly searched without finding
-    // much genuinely new information.
-    if state.iteration >= 3 && state.retrieval_novelty < 0.15 {
-        return RetrievalAction::Abstain;
     }
 
     RetrievalAction::UseCurrent
