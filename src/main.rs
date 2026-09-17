@@ -202,7 +202,7 @@ fn main() {
         println!("Claim coverage:           {:.3}", state.claim_coverage);
 
         println!("Source diversity:         {:.3}", state.source_diversity);
-
+        println!("Source quality:           {:.3}", state.source_quality);
         println!("Retrieval novelty:        {:.3}", state.retrieval_novelty);
 
         let action = choose_action(&state);
@@ -222,6 +222,7 @@ fn main() {
         if action != RetrievalAction::DiversifySources
             && action != RetrievalAction::ReformulateQuery
             && action != RetrievalAction::SeekComplementaryEvidence
+            && action != RetrievalAction::SeekHigherQualityEvidence
         {
             println!(
                 "TACER stopping: action {:?} is not yet implemented.",
@@ -246,6 +247,10 @@ fn main() {
                 println!("\nSEEK COMPLEMENTARY EVIDENCE");
             }
 
+            RetrievalAction::SeekHigherQualityEvidence => {
+                println!("\nSEEK HIGHER QUALITY EVIDENCE");
+            }
+
             _ => unreachable!(),
         }
 
@@ -264,6 +269,12 @@ fn main() {
             RetrievalAction::SeekComplementaryEvidence => {
                 format!(
                     "{} mechanism details missing evidence specific relationship",
+                    claim
+                )
+            }
+            RetrievalAction::SeekHigherQualityEvidence => {
+                format!(
+                    "{} primary source official documentation peer reviewed research authoritative evidence",
                     claim
                 )
             }

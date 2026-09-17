@@ -58,6 +58,10 @@ pub enum RetrievalAction {
     /// a missing part of the claim.
     SeekComplementaryEvidence,
 
+    /// Search specifically for stronger-quality evidence
+    /// when current evidence is relevant but has weak provenance.
+    SeekHigherQualityEvidence,
+
     /// Evidence acquisition has failed or remains
     /// too uncertain to justify a commitment.
     Abstain,
