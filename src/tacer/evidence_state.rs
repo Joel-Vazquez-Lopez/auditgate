@@ -68,6 +68,9 @@ pub fn build_evidence_state(
     claim: &str,
     passages: &[ScoredEvidencePassage],
     retrieval_novelty: f64,
+    support_strength: f64,
+    contradiction_strength: f64,
+    evidence_conflict: f64,
     iteration: usize,
 ) -> EvidenceState {
     let positive_passages: Vec<&str> = passages
@@ -92,9 +95,9 @@ pub fn build_evidence_state(
         source_diversity,
         source_quality,
 
-        support_strength: f64::NAN,
-        contradiction_strength: f64::NAN,
-        evidence_conflict: f64::NAN,
+        support_strength,
+        contradiction_strength,
+        evidence_conflict,
 
         retrieval_novelty,
         iteration,

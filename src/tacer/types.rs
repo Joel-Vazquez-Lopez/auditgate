@@ -58,6 +58,8 @@ pub enum RetrievalAction {
     /// a missing part of the claim.
     SeekComplementaryEvidence,
 
+    SeekOpposingEvidence,
+
     /// Search specifically for stronger-quality evidence
     /// when current evidence is relevant but has weak provenance.
     SeekHigherQualityEvidence,

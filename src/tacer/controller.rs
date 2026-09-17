@@ -5,6 +5,12 @@ pub fn choose_action(state: &EvidenceState) -> RetrievalAction {
     if state.candidate_count == 0 {
         return RetrievalAction::BroadenSearch;
     }
+    if state.iteration == 0
+        && ((state.support_strength >= 0.90 && state.contradiction_strength < 0.50)
+            || (state.contradiction_strength >= 0.90 && state.support_strength < 0.50))
+    {
+        return RetrievalAction::SeekOpposingEvidence;
+    }
 
     // Strong unresolved contradiction between evidence sources.
     if state.support_strength >= 0.80 && state.contradiction_strength >= 0.80 {

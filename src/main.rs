@@ -189,8 +189,39 @@ fn main() {
     loop {
         println!("\nTACER — ITERATION {}", iteration);
 
-        let state =
-            build_evidence_state(&claim, &final_online_passages, retrieval_novelty, iteration);
+        let semantic_evidence: Vec<&str> = final_online_passages
+            .iter()
+            .take(5)
+            .map(|candidate| candidate.passage.text.as_str())
+            .collect();
+
+        let semantic_verification = verify(&claim, semantic_evidence);
+
+        let support_strength = semantic_verification
+            .results
+            .iter()
+            .filter(|result| result.label == "supported")
+            .map(|result| result.confidence)
+            .fold(0.0_f64, f64::max);
+
+        let contradiction_strength = semantic_verification
+            .results
+            .iter()
+            .filter(|result| result.label == "contradicted")
+            .map(|result| result.confidence)
+            .fold(0.0_f64, f64::max);
+
+        let evidence_conflict = support_strength.min(contradiction_strength);
+
+        let state = build_evidence_state(
+            &claim,
+            &final_online_passages,
+            retrieval_novelty,
+            support_strength,
+            contradiction_strength,
+            evidence_conflict,
+            iteration,
+        );
 
         println!("Candidates:              {}", state.candidate_count);
 
@@ -203,6 +234,12 @@ fn main() {
 
         println!("Source diversity:         {:.3}", state.source_diversity);
         println!("Source quality:           {:.3}", state.source_quality);
+        println!("Support strength:         {:.3}", state.support_strength);
+        println!(
+            "Contradiction strength:   {:.3}",
+            state.contradiction_strength
+        );
+        println!("Evidence conflict:        {:.3}", state.evidence_conflict);
         println!("Retrieval novelty:        {:.3}", state.retrieval_novelty);
 
         let action = choose_action(&state);
@@ -222,6 +259,7 @@ fn main() {
         if action != RetrievalAction::DiversifySources
             && action != RetrievalAction::ReformulateQuery
             && action != RetrievalAction::SeekComplementaryEvidence
+            && action != RetrievalAction::SeekOpposingEvidence
             && action != RetrievalAction::SeekHigherQualityEvidence
         {
             println!(
@@ -245,6 +283,10 @@ fn main() {
 
             RetrievalAction::SeekComplementaryEvidence => {
                 println!("\nSEEK COMPLEMENTARY EVIDENCE");
+            }
+
+            RetrievalAction::SeekOpposingEvidence => {
+                println!("\nSEEK OPPOSING EVIDENCE");
             }
 
             RetrievalAction::SeekHigherQualityEvidence => {
@@ -271,6 +313,17 @@ fn main() {
                     "{} mechanism details missing evidence specific relationship",
                     claim
                 )
+            }
+
+            RetrievalAction::SeekOpposingEvidence => {
+                if state.support_strength > state.contradiction_strength {
+                    format!(
+                        "{} contrary evidence contradiction criticism evidence against",
+                        claim
+                    )
+                } else {
+                    format!("{} supporting evidence confirmation evidence for", claim)
+                }
             }
             RetrievalAction::SeekHigherQualityEvidence => {
                 format!(
