@@ -7,6 +7,11 @@ use acquisition::{
     SearchProvider, SearchRequest, SourceFetcher, TavilySearchProvider, extract_passages,
     rank_passages,
 };
+
+use axum::{
+    Json, Router,
+    routing::{get, post},
+};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::io::Write;
@@ -106,14 +111,73 @@ struct Args {
     claim: String,
 }
 
+#[derive(Deserialize)]
+struct AuditRequest {
+    claim: String,
+}
+
+#[derive(Serialize)]
+struct AuditResponse {
+    claim: String,
+    decision: String,
+    reason: String,
+}
+
 // --------------------------------------------------
 // Main AuditGate pipeline
 // --------------------------------------------------
 
+async fn health_live() -> &'static str {
+    "ok"
+}
+
+async fn audit_handler(Json(request): Json<AuditRequest>) -> Json<AuditResponse> {
+    let claim = request.claim;
+    let audit_claim_text = claim.clone();
+
+    let audit_decision = tokio::task::spawn_blocking(move || audit_claim(audit_claim_text))
+        .await
+        .expect("Audit task failed");
+
+    Json(AuditResponse {
+        claim,
+        decision: audit_decision.decision,
+        reason: audit_decision.reason,
+    })
+}
+
+async fn run_server() {
+    let app = Router::new()
+        .route("/health/live", get(health_live))
+        .route("/v1/audit", post(audit_handler));
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+        .await
+        .expect("Could not bind API server");
+
+    println!("AuditGate API listening on http://0.0.0.0:3000");
+
+    axum::serve(listener, app)
+        .await
+        .expect("AuditGate API server failed");
+}
+
 fn main() {
     let args = Args::parse();
+
+    if args.claim == "serve" {
+        let runtime = tokio::runtime::Runtime::new().expect("Could not create Tokio runtime");
+
+        runtime.block_on(run_server());
+        return;
+    }
+
     let claim = args.claim;
 
+    audit_claim(claim);
+}
+
+fn audit_claim(claim: String) -> decision::AuditDecision {
     // --------------------------------------------------
     // Online evidence discovery
     // --------------------------------------------------
@@ -484,4 +548,6 @@ fn main() {
     println!("Decision: {}", audit_decision.decision);
 
     println!("Reason: {}", audit_decision.reason);
+
+    audit_decision
 }
