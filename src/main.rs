@@ -10,6 +10,7 @@ use acquisition::{
 
 use axum::{
     Json, Router,
+    http::StatusCode,
     routing::{get, post},
 };
 use clap::Parser;
@@ -27,6 +28,12 @@ use tacer::{build_evidence_state, choose_action};
 struct VerificationInput<'a> {
     claim: &'a str,
     evidence: Vec<&'a str>,
+}
+
+#[derive(Serialize)]
+struct ErrorResponse {
+    error: String,
+    message: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -131,19 +138,39 @@ async fn health_live() -> &'static str {
     "ok"
 }
 
-async fn audit_handler(Json(request): Json<AuditRequest>) -> Json<AuditResponse> {
+async fn audit_handler(
+    Json(request): Json<AuditRequest>,
+) -> Result<Json<AuditResponse>, (StatusCode, Json<ErrorResponse>)> {
     let claim = request.claim;
     let audit_claim_text = claim.clone();
 
-    let audit_decision = tokio::task::spawn_blocking(move || audit_claim(audit_claim_text))
+    let audit_result = tokio::task::spawn_blocking(move || audit_claim(audit_claim_text))
         .await
-        .expect("Audit task failed");
+        .map_err(|error| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ErrorResponse {
+                    error: "audit_task_failed".to_string(),
+                    message: error.to_string(),
+                }),
+            )
+        })?;
 
-    Json(AuditResponse {
+    let audit_decision = audit_result.map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ErrorResponse {
+                error: "audit_failed".to_string(),
+                message: error,
+            }),
+        )
+    })?;
+
+    Ok(Json(AuditResponse {
         claim,
         decision: audit_decision.decision,
         reason: audit_decision.reason,
-    })
+    }))
 }
 
 async fn run_server() {
@@ -174,18 +201,21 @@ fn main() {
 
     let claim = args.claim;
 
-    audit_claim(claim);
+    if let Err(error) = audit_claim(claim) {
+        eprintln!("Audit failed: {}", error);
+        std::process::exit(1);
+    }
 }
 
-fn audit_claim(claim: String) -> decision::AuditDecision {
+fn audit_claim(claim: String) -> Result<decision::AuditDecision, String> {
     // --------------------------------------------------
     // Online evidence discovery
     // --------------------------------------------------
 
     println!("\nONLINE EVIDENCE SEARCH");
 
-    let search_provider =
-        TavilySearchProvider::from_env().expect("Could not initialize search provider");
+    let search_provider = TavilySearchProvider::from_env()
+        .map_err(|error| format!("Could not initialize search provider: {}", error))?;
 
     let search_request = SearchRequest {
         query: claim.clone(),
@@ -194,7 +224,7 @@ fn audit_claim(claim: String) -> decision::AuditDecision {
 
     let search_results = search_provider
         .search(&search_request)
-        .expect("Online evidence search failed");
+        .map_err(|error| format!("Online evidence search failed: {}", error))?;
 
     println!("Sources found: {}", search_results.len());
 
@@ -206,7 +236,8 @@ fn audit_claim(claim: String) -> decision::AuditDecision {
     println!("ONLINE EVIDENCE ACQUISITION");
     println!("================================");
 
-    let fetcher = SourceFetcher::new().expect("Could not initialize source fetcher");
+    let fetcher = SourceFetcher::new()
+        .map_err(|error| format!("Could not initialize source fetcher: {}", error))?;
 
     let mut online_passages = Vec::new();
 
@@ -239,8 +270,8 @@ fn audit_claim(claim: String) -> decision::AuditDecision {
     println!("ONLINE EVIDENCE RANKING");
     println!("================================");
 
-    let ranked_online_passages =
-        rank_passages(&claim, &online_passages).expect("Could not rank online evidence");
+    let ranked_online_passages = rank_passages(&claim, &online_passages)
+        .map_err(|error| format!("Could not rank online evidence: {}", error))?;
 
     println!("Scored passages: {}", ranked_online_passages.len());
 
@@ -408,7 +439,7 @@ fn audit_claim(claim: String) -> decision::AuditDecision {
 
         let diversified_results = search_provider
             .search(&diversified_request)
-            .expect("Diversified search failed");
+            .map_err(|error| format!("Diversified search failed: {}", error))?;
 
         let existing_urls: std::collections::HashSet<String> = final_online_passages
             .iter()
@@ -484,10 +515,9 @@ fn audit_claim(claim: String) -> decision::AuditDecision {
 
         println!("\nEVIDENCE RERANKING — ITERATION {}", iteration);
 
-        final_online_passages =
-            rank_passages(&claim, &online_passages).expect("Could not rerank diversified evidence");
+        final_online_passages = rank_passages(&claim, &online_passages)
+            .map_err(|error| format!("Could not rerank diversified evidence: {}", error))?;
     }
-
     // --------------------------------------------------
     // Evidence currently passed to verifier
     // --------------------------------------------------
@@ -549,5 +579,5 @@ fn audit_claim(claim: String) -> decision::AuditDecision {
 
     println!("Reason: {}", audit_decision.reason);
 
-    audit_decision
+    Ok(audit_decision)
 }
