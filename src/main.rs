@@ -138,6 +138,14 @@ async fn health_live() -> &'static str {
     "ok"
 }
 
+async fn health_ready() -> StatusCode {
+    if std::env::var("TAVILY_API_KEY").is_ok() {
+        StatusCode::OK
+    } else {
+        StatusCode::SERVICE_UNAVAILABLE
+    }
+}
+
 async fn audit_handler(
     Json(request): Json<AuditRequest>,
 ) -> Result<Json<AuditResponse>, (StatusCode, Json<ErrorResponse>)> {
@@ -176,6 +184,7 @@ async fn audit_handler(
 async fn run_server() {
     let app = Router::new()
         .route("/health/live", get(health_live))
+        .route("/health/ready", get(health_ready))
         .route("/v1/audit", post(audit_handler));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
