@@ -1,0 +1,10 @@
+.git
+.venv
+target
+data
+results
+checkpoints
+models
+__pycache__
+*.pyc
+.DS_Store
