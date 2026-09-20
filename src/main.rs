@@ -25,6 +25,37 @@ use tacer::{build_evidence_state, choose_action};
 // --------------------------------------------------
 
 #[derive(Serialize)]
+struct AuditEvidence {
+    source_url: String,
+    source_title: String,
+    text: String,
+    relevance_score: f64,
+    verification_label: String,
+    verification_confidence: f64,
+}
+
+#[derive(Serialize)]
+struct AuditTacerStep {
+    iteration: usize,
+    candidate_count: usize,
+    relevance_concentration: f64,
+    claim_coverage: f64,
+    source_diversity: f64,
+    source_quality: f64,
+    support_strength: f64,
+    contradiction_strength: f64,
+    evidence_conflict: f64,
+    retrieval_novelty: f64,
+    action: String,
+}
+
+struct AuditResult {
+    decision: decision::AuditDecision,
+    evidence: Vec<AuditEvidence>,
+    tacer_trace: Vec<AuditTacerStep>,
+}
+
+#[derive(Serialize)]
 struct VerificationInput<'a> {
     claim: &'a str,
     evidence: Vec<&'a str>,
@@ -128,6 +159,8 @@ struct AuditResponse {
     claim: String,
     decision: String,
     reason: String,
+    evidence: Vec<AuditEvidence>,
+    tacer_trace: Vec<AuditTacerStep>,
 }
 
 // --------------------------------------------------
@@ -175,10 +208,12 @@ async fn audit_handler(
     })?;
 
     Ok(Json(AuditResponse {
-        claim,
-        decision: audit_decision.decision,
-        reason: audit_decision.reason,
-    }))
+    claim,
+    decision: audit_decision.decision.decision,
+    reason: audit_decision.decision.reason,
+    evidence: audit_decision.evidence,
+    tacer_trace: audit_decision.tacer_trace,
+}))
 }
 
 async fn run_server() {
@@ -216,7 +251,7 @@ fn main() {
     }
 }
 
-fn audit_claim(claim: String) -> Result<decision::AuditDecision, String> {
+fn audit_claim(claim: String) -> Result<AuditResult, String> {
     // --------------------------------------------------
     // Online evidence discovery
     // --------------------------------------------------
@@ -285,6 +320,8 @@ fn audit_claim(claim: String) -> Result<decision::AuditDecision, String> {
     println!("Scored passages: {}", ranked_online_passages.len());
 
     const MAX_TACER_ITERATIONS: usize = 3;
+    
+    let mut tacer_trace: Vec<AuditTacerStep> = Vec::new();
 
     let mut final_online_passages = ranked_online_passages;
     let mut iteration = 0;
@@ -347,6 +384,20 @@ fn audit_claim(claim: String) -> Result<decision::AuditDecision, String> {
         println!("Retrieval novelty:        {:.3}", state.retrieval_novelty);
 
         let action = choose_action(&state);
+
+        tacer_trace.push(AuditTacerStep {
+    iteration: state.iteration,
+    candidate_count: state.candidate_count,
+    relevance_concentration: state.relevance_concentration,
+    claim_coverage: state.claim_coverage,
+    source_diversity: state.source_diversity,
+    source_quality: state.source_quality,
+    support_strength: state.support_strength,
+    contradiction_strength: state.contradiction_strength,
+    evidence_conflict: state.evidence_conflict,
+    retrieval_novelty: state.retrieval_novelty,
+    action: format!("{:?}", action),
+});
 
         println!("TACER action:             {:?}", action);
 
@@ -574,6 +625,20 @@ fn audit_claim(claim: String) -> Result<decision::AuditDecision, String> {
         println!("→ {} ({:.3})", result.label, result.confidence);
     }
 
+let audit_evidence: Vec<AuditEvidence> = final_online_passages
+    .iter()
+    .take(10)
+    .zip(verification.results.iter())
+    .map(|(candidate, result)| AuditEvidence {
+        source_url: candidate.passage.source_url.clone(),
+        source_title: candidate.passage.source_title.clone(),
+        text: candidate.passage.text.clone(),
+        relevance_score: candidate.relevance_score,
+        verification_label: result.label.clone(),
+        verification_confidence: result.confidence,
+    })
+    .collect();
+    
     // --------------------------------------------------
     // AuditGate decision
     // --------------------------------------------------
@@ -588,5 +653,9 @@ fn audit_claim(claim: String) -> Result<decision::AuditDecision, String> {
 
     println!("Reason: {}", audit_decision.reason);
 
-    Ok(audit_decision)
+    Ok(AuditResult {
+    decision: audit_decision,
+    evidence: audit_evidence,
+    tacer_trace,
+})
 }
