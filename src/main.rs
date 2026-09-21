@@ -149,6 +149,20 @@ struct Args {
     claim: String,
 }
 
+#[derive(Serialize, Debug, Clone)]
+struct ExtractedClaim {
+    text: String,
+}
+
+struct AuditedClaim {
+    claim: ExtractedClaim,
+    audit: AuditResult,
+}
+
+struct TextAuditResult {
+    claims: Vec<AuditedClaim>,
+}
+
 #[derive(Deserialize)]
 struct AuditRequest {
     claim: String,
@@ -161,6 +175,25 @@ struct AuditResponse {
     reason: String,
     evidence: Vec<AuditEvidence>,
     tacer_trace: Vec<AuditTacerStep>,
+}
+
+#[derive(Deserialize)]
+struct TextAuditRequest {
+    text: String,
+}
+
+#[derive(Serialize)]
+struct AuditedClaimResponse {
+    claim: String,
+    decision: String,
+    reason: String,
+    evidence: Vec<AuditEvidence>,
+    tacer_trace: Vec<AuditTacerStep>,
+}
+
+#[derive(Serialize)]
+struct TextAuditResponse {
+    claims: Vec<AuditedClaimResponse>,
 }
 
 // --------------------------------------------------
@@ -216,12 +249,56 @@ async fn audit_handler(
 }))
 }
 
+async fn audit_text_handler(
+    Json(request): Json<TextAuditRequest>,
+) -> Result<Json<TextAuditResponse>, (StatusCode, Json<ErrorResponse>)> {
+    let text = request.text;
+
+    let audit_result = tokio::task::spawn_blocking(move || audit_text(&text))
+        .await
+        .map_err(|error| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ErrorResponse {
+                    error: "audit_text_task_failed".to_string(),
+                    message: error.to_string(),
+                }),
+            )
+        })?;
+
+    let text_audit = audit_result.map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ErrorResponse {
+                error: "audit_text_failed".to_string(),
+                message: error,
+            }),
+        )
+    })?;
+
+    let claims = text_audit
+        .claims
+        .into_iter()
+        .map(|audited_claim| AuditedClaimResponse {
+            claim: audited_claim.claim.text,
+            decision: audited_claim.audit.decision.decision,
+            reason: audited_claim.audit.decision.reason,
+            evidence: audited_claim.audit.evidence,
+            tacer_trace: audited_claim.audit.tacer_trace,
+        })
+        .collect();
+
+    Ok(Json(TextAuditResponse { claims }))
+}
+
 async fn run_server() {
     let app = Router::new()
         .route("/health/live", get(health_live))
         .route("/health/ready", get(health_ready))
-        .route("/v1/audit", post(audit_handler));
+        .route("/v1/audit", post(audit_handler))
+        .route("/v1/audit-text", post(audit_text_handler));
 
+        
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await
         .expect("Could not bind API server");
@@ -235,6 +312,23 @@ async fn run_server() {
 
 fn main() {
     let args = Args::parse();
+
+    if args.claim.starts_with("extract:") {
+    let text = args.claim.trim_start_matches("extract:").trim();
+
+    match extract_claims(text) {
+        Ok(claims) => {
+            for (index, claim) in claims.iter().enumerate() {
+                println!("{}. {}", index + 1, claim.text);
+            }
+        }
+        Err(error) => {
+            eprintln!("Claim extraction failed: {}", error);
+        }
+    }
+
+    return;
+}
 
     if args.claim == "serve" {
         let runtime = tokio::runtime::Runtime::new().expect("Could not create Tokio runtime");
@@ -251,7 +345,42 @@ fn main() {
     }
 }
 
-fn audit_claim(claim: String) -> Result<AuditResult, String> {
+// V0 baseline only: sentence segmentation, not semantic claim extraction.
+// This does not yet filter opinions/non-verifiable statements or decompose
+// compound sentences into atomic claims.
+
+fn extract_claims(text: &str) -> Result<Vec<ExtractedClaim>, String> {
+    let claims = text
+        .split(['.', '!', '?'])
+        .map(str::trim)
+        .filter(|sentence| !sentence.is_empty())
+        .map(|sentence| ExtractedClaim {
+            text: sentence.to_string(),
+        })
+        .collect();
+
+    Ok(claims)
+}
+
+fn audit_text(text: &str) -> Result<TextAuditResult, String> {
+    let extracted_claims = extract_claims(text)?;
+    let mut audited_claims = Vec::new();
+
+    for claim in extracted_claims {
+        let audit = audit_claim(claim.text.clone())?;
+
+        audited_claims.push(AuditedClaim {
+            claim,
+            audit,
+        });
+    }
+
+    Ok(TextAuditResult {
+        claims: audited_claims,
+    })
+}
+    fn audit_claim(claim: String) -> Result<AuditResult, String> {
+
     // --------------------------------------------------
     // Online evidence discovery
     // --------------------------------------------------
