@@ -2,6 +2,7 @@ mod acquisition;
 mod decision;
 mod overlap;
 mod tacer;
+mod extraction;
 
 use acquisition::{
     SearchProvider, SearchRequest, SourceFetcher, TavilySearchProvider, extract_passages,
@@ -152,6 +153,14 @@ struct Args {
 #[derive(Serialize, Debug, Clone)]
 struct ExtractedClaim {
     text: String,
+    source_text: String,
+    kind: ClaimKind,
+}
+
+#[derive(Serialize, Debug, Clone, PartialEq)]
+enum ClaimKind {
+    Verifiable,
+    NonVerifiable,
 }
 
 struct AuditedClaim {
@@ -355,8 +364,10 @@ fn extract_claims(text: &str) -> Result<Vec<ExtractedClaim>, String> {
         .map(str::trim)
         .filter(|sentence| !sentence.is_empty())
         .map(|sentence| ExtractedClaim {
-            text: sentence.to_string(),
-        })
+        text: sentence.to_string(),
+        source_text: sentence.to_string(),
+        kind: ClaimKind::Verifiable,
+    })
         .collect();
 
     Ok(claims)
