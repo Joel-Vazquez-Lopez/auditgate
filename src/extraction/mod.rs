@@ -91,6 +91,26 @@ pub struct SemanticClaim {
     pub source_id: usize,
     pub kind: SemanticClaimKind,
 }
+#[derive(Debug, Clone, PartialEq)]
+pub enum FaithfulnessDecision {
+    Faithful,
+    Unsafe,
+}
+
+#[derive(Debug, Clone)]
+pub struct FaithfulnessResult {
+    pub decision: FaithfulnessDecision,
+    pub reason: String,
+}
+
+pub trait FaithfulnessGate {
+    fn evaluate(
+        &self,
+        source: &SourceUnit,
+        claim: &SemanticClaim,
+    ) -> Result<FaithfulnessResult, String>;
+}
+
 fn validate_wire_response(
     request: &ExtractionRequest,
     response: ExtractionWireResponse,
@@ -138,9 +158,171 @@ fn validate_wire_response(
     Ok(claims)
 }
 
+#[derive(Debug, Clone)]
+pub struct T5ClaimExtractor;
+
+impl ClaimExtractor for T5ClaimExtractor {
+    type Output = SemanticClaim;
+
+    fn extract(
+        &self,
+        request: &ExtractionRequest,
+    ) -> Result<Vec<Self::Output>, String> {
+        let wire_request = ExtractionWireRequest {
+            sources: request
+                .sources
+                .iter()
+                .map(|source| ExtractionWireSource {
+                    id: source.id,
+                    text: source.text.as_str(),
+                })
+                .collect(),
+        };
+
+        let input = serde_json::to_string(&wire_request)
+            .map_err(|error| format!("Failed to serialize extraction request: {}", error))?;
+
+        let mut child = std::process::Command::new("python")
+            .arg("extractor/extract.py")
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::inherit())
+            .spawn()
+            .map_err(|error| format!("Failed to start claim extractor: {}", error))?;
+
+        {
+            use std::io::Write;
+
+            let stdin = child
+                .stdin
+                .as_mut()
+                .ok_or_else(|| "Failed to open claim extractor stdin".to_string())?;
+
+            stdin
+                .write_all(input.as_bytes())
+                .map_err(|error| format!("Failed to send extraction request: {}", error))?;
+        }
+
+        let output = child
+            .wait_with_output()
+            .map_err(|error| format!("Claim extractor process failed: {}", error))?;
+
+        if !output.status.success() {
+            return Err(format!(
+                "Claim extractor exited with status {}",
+                output.status
+            ));
+        }
+
+        let response: ExtractionWireResponse = serde_json::from_slice(&output.stdout)
+            .map_err(|error| format!("Invalid claim extractor response: {}", error))?;
+
+        validate_wire_response(request, response)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+        struct FaithfulnessCase {
+        name: &'static str,
+        source: &'static str,
+        candidate: &'static str,
+        expected: FaithfulnessDecision,
+    }
+
+    fn faithfulness_cases() -> Vec<FaithfulnessCase> {
+        vec![
+            FaithfulnessCase {
+                name: "unchanged factual claim",
+                source: "The Eiffel Tower was completed in 1889.",
+                candidate: "The Eiffel Tower was completed in 1889.",
+                expected: FaithfulnessDecision::Faithful,
+            },
+            FaithfulnessCase {
+                name: "valid atomic decomposition",
+                source: "The Eiffel Tower is in Paris and was completed in 1889.",
+                candidate: "The Eiffel Tower was completed in 1889.",
+                expected: FaithfulnessDecision::Faithful,
+            },
+            FaithfulnessCase {
+                name: "preserved hedge",
+                source: "Researchers suggest that the treatment may reduce mortality.",
+                candidate: "Researchers suggest that the treatment may reduce mortality.",
+                expected: FaithfulnessDecision::Faithful,
+            },
+            FaithfulnessCase {
+                name: "question converted to assertion",
+                source: "Is the Eiffel Tower in Paris?",
+                candidate: "The Eiffel Tower is in Paris.",
+                expected: FaithfulnessDecision::Unsafe,
+            },
+            FaithfulnessCase {
+                name: "conditional converted to assertion",
+                source: "If temperatures continue to rise, sea levels could increase substantially by 2100.",
+                candidate: "Temperatures continue to rise.",
+                expected: FaithfulnessDecision::Unsafe,
+            },
+            FaithfulnessCase {
+                name: "conditional dependency removed",
+                source: "If temperatures continue to rise, sea levels could increase substantially by 2100.",
+                candidate: "Sea levels could increase substantially by 2100.",
+                expected: FaithfulnessDecision::Unsafe,
+            },
+            FaithfulnessCase {
+                name: "causal relation removed",
+                source: "The model achieved 92% accuracy because it learned robust representations.",
+                candidate: "The model learned robust representations.",
+                expected: FaithfulnessDecision::Unsafe,
+            },
+        ]
+    }
+
+    #[test]
+    fn faithfulness_suite_is_defined() {
+        let cases = faithfulness_cases();
+
+        assert!(cases.iter().any(|case| {
+            case.expected == FaithfulnessDecision::Faithful
+        }));
+
+        assert!(cases.iter().any(|case| {
+            case.expected == FaithfulnessDecision::Unsafe
+        }));
+
+        for case in cases {
+            assert!(!case.name.is_empty());
+            assert!(!case.source.is_empty());
+            assert!(!case.candidate.is_empty());
+        }
+    }
+    #[test]
+    fn t5_extractor_runs_end_to_end() {
+        let extractor = T5ClaimExtractor;
+
+        let request = ExtractionRequest {
+            sources: vec![SourceUnit {
+                id: 42,
+                text: "The Eiffel Tower is in Paris and was completed in 1889.".to_string(),
+            }],
+        };
+
+        let claims = extractor
+            .extract(&request)
+            .expect("T5 claim extraction should succeed");
+
+        assert_eq!(claims.len(), 2);
+
+        assert_eq!(claims[0].text, "The Eiffel Tower is in Paris.");
+        assert_eq!(claims[0].source_id, 42);
+
+        assert_eq!(
+            claims[1].text,
+            "The Eiffel Tower was completed in 1889."
+        );
+        assert_eq!(claims[1].source_id, 42);
+    }
+
     struct ExtractionCase {
         name: &'static str,
         input: &'static str,
@@ -148,7 +330,7 @@ mod tests {
         expected_non_verifiable: &'static [&'static str],
     }
 
-    fn regression_cases() -> Vec<ExtractionCase> {
+        fn regression_cases() -> Vec<ExtractionCase> {
         vec![
             ExtractionCase {
                 name: "simple factual claim",
@@ -270,6 +452,46 @@ mod tests {
             },
         ]
     }
+   #[test]
+fn t5_extractor_regression_baseline() {
+    let cases = regression_cases();
+    let extractor = T5ClaimExtractor;
+
+    let request = ExtractionRequest {
+        sources: cases
+            .iter()
+            .enumerate()
+            .map(|(id, case)| SourceUnit {
+                id,
+                text: case.input.to_string(),
+            })
+            .collect(),
+    };
+
+    let claims = extractor
+        .extract(&request)
+        .expect("T5 claim extraction should succeed");
+
+    for (id, case) in cases.iter().enumerate() {
+        let actual: Vec<&str> = claims
+            .iter()
+            .filter(|claim| claim.source_id == id)
+            .map(|claim| claim.text.as_str())
+            .collect();
+
+        let expected: Vec<&str> = case
+            .expected_verifiable
+            .iter()
+            .chain(case.expected_non_verifiable.iter())
+            .copied()
+            .collect();
+
+        println!("\nCASE: {}", case.name);
+        println!("SOURCE: {}", case.input);
+        println!("EXPECTED: {:?}", expected);
+        println!("ACTUAL:   {:?}", actual);
+    }
+}
 
     #[test]
     fn regression_suite_is_defined() {
@@ -389,6 +611,4 @@ fn accepts_valid_semantic_claims() {
     assert_eq!(claims[1].source_id, 0);
     assert_eq!(claims[1].kind, SemanticClaimKind::Verifiable);
 }
-
-
 }
