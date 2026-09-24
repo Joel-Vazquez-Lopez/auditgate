@@ -86,6 +86,7 @@ pub enum SemanticClaimKind {
 ///    Extraction identifies what the text asserts. It does not decide whether
 ///    the assertion is true. Truth assessment belongs to AuditGate downstream.
 
+#[derive(Debug, Clone)]
 pub struct SemanticClaim {
     pub text: String,
     pub source_id: usize,
@@ -109,6 +110,35 @@ pub trait FaithfulnessGate {
         source: &SourceUnit,
         claim: &SemanticClaim,
     ) -> Result<FaithfulnessResult, String>;
+}
+
+#[derive(Debug, Clone)]
+pub enum FaithfulnessOutcome {
+    Accepted(SemanticClaim),
+    SourceFallback(SourceUnit),
+}
+
+fn apply_faithfulness(
+    source: &SourceUnit,
+    claim: &SemanticClaim,
+    result: &FaithfulnessResult,
+) -> Result<FaithfulnessOutcome, String> {
+        if source.id != claim.source_id {
+        return Err(format!(
+            "Faithfulness source mismatch: source_id {} != claim source_id {}",
+            source.id,
+            claim.source_id
+        ));
+    }
+
+    match result.decision {
+        FaithfulnessDecision::Faithful => {
+            Ok(FaithfulnessOutcome::Accepted(claim.clone()))
+        }
+        FaithfulnessDecision::Unsafe => {
+            Ok(FaithfulnessOutcome::SourceFallback(source.clone()))
+        }
+    }
 }
 
 fn validate_wire_response(
@@ -230,6 +260,97 @@ mod tests {
         candidate: &'static str,
         expected: FaithfulnessDecision,
     }
+        #[test]
+    fn faithful_candidate_is_accepted() {
+        let source = SourceUnit {
+            id: 7,
+            text: "The Eiffel Tower is in Paris and was completed in 1889.".to_string(),
+        };
+
+        let claim = SemanticClaim {
+            text: "The Eiffel Tower was completed in 1889.".to_string(),
+            source_id: 7,
+            kind: SemanticClaimKind::Verifiable,
+        };
+
+        let result = FaithfulnessResult {
+            decision: FaithfulnessDecision::Faithful,
+            reason: "Candidate preserves the source assertion.".to_string(),
+        };
+
+        let outcome = apply_faithfulness(&source, &claim, &result)
+        .expect("Matching source and claim IDs should succeed");
+
+        match outcome {
+            FaithfulnessOutcome::Accepted(accepted) => {
+                assert_eq!(
+                    accepted.text,
+                    "The Eiffel Tower was completed in 1889."
+                );
+                assert_eq!(accepted.source_id, 7);
+            }
+            FaithfulnessOutcome::SourceFallback(_) => {
+                panic!("Faithful candidate should be accepted");
+            }
+        }
+    }
+
+    #[test]
+    fn unsafe_candidate_falls_back_to_exact_source() {
+        let source = SourceUnit {
+            id: 9,
+            text: "Is the Eiffel Tower in Paris?".to_string(),
+        };
+
+        let claim = SemanticClaim {
+            text: "The Eiffel Tower is in Paris.".to_string(),
+            source_id: 9,
+            kind: SemanticClaimKind::Verifiable,
+        };
+
+        let result = FaithfulnessResult {
+            decision: FaithfulnessDecision::Unsafe,
+            reason: "Question was converted into an assertion.".to_string(),
+        };
+
+        let outcome = apply_faithfulness(&source, &claim, &result)
+        .expect("Matching source and claim IDs should succeed");
+
+        match outcome {
+            FaithfulnessOutcome::SourceFallback(fallback) => {
+                assert_eq!(fallback.id, 9);
+                assert_eq!(fallback.text, "Is the Eiffel Tower in Paris?");
+            }
+            FaithfulnessOutcome::Accepted(_) => {
+                panic!("Unsafe candidate should not be accepted");
+            }
+        }
+    }
+    
+    #[test]
+fn faithfulness_rejects_source_mismatch() {
+    let source = SourceUnit {
+        id: 1,
+        text: "The Eiffel Tower is in Paris.".to_string(),
+    };
+
+    let claim = SemanticClaim {
+        text: "The Eiffel Tower is in Paris.".to_string(),
+        source_id: 2,
+        kind: SemanticClaimKind::Verifiable,
+    };
+
+    let result = FaithfulnessResult {
+        decision: FaithfulnessDecision::Faithful,
+        reason: "Candidate appears faithful.".to_string(),
+    };
+
+    let error = apply_faithfulness(&source, &claim, &result)
+        .expect_err("Mismatched source IDs must be rejected");
+
+    assert!(error.contains("source mismatch"));
+}
+
 
     fn faithfulness_cases() -> Vec<FaithfulnessCase> {
         vec![
