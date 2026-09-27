@@ -92,6 +92,14 @@ pub struct SemanticClaim {
     pub source_id: usize,
     pub kind: SemanticClaimKind,
 }
+
+pub trait VerifiabilityClassifier {
+    fn classify(
+        &self,
+        claim: &SemanticClaim,
+    ) -> Result<SemanticClaimKind, String>;
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum FaithfulnessDecision {
     Faithful,
