@@ -47,6 +47,7 @@ def main() -> None:
     tokenized_dataset = dataset.map(
         tokenize_batch,
         batched=True,
+        remove_columns=dataset["train"].column_names,
     )
 
     print(dataset)
@@ -55,11 +56,8 @@ def main() -> None:
     example = tokenized_dataset["train"][0]
 
     print("\nTokenization check:")
-    print("Text:", example["text"])
-    print("Label:", example["label"])
     print("Encoded label:", example["labels"])
     print("Token count:", len(example["input_ids"]))
-
 
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME,
@@ -130,6 +128,19 @@ def main() -> None:
     print("Train batch size:", training_args.per_device_train_batch_size)
     print("Eval batch size:", training_args.per_device_eval_batch_size)
     print("Learning rate:", training_args.learning_rate)
+
+    print("\nStarting DistilBERT fine-tuning...")
+    train_result = trainer.train()
+
+    print("\nTraining complete.")
+    print("Best checkpoint:", trainer.state.best_model_checkpoint)
+    print("Best validation loss:", trainer.state.best_metric)
+
+    final_model_dir = Path(__file__).parent / "models" / "distilbert" / "best"
+    trainer.save_model(final_model_dir)
+    tokenizer.save_pretrained(final_model_dir)
+
+    print("Saved best model to:", final_model_dir)
 
 if __name__ == "__main__":
     main()
