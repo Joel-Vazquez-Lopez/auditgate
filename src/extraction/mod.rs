@@ -100,6 +100,93 @@ pub trait VerifiabilityClassifier {
     ) -> Result<SemanticClaimKind, String>;
 }
 
+#[derive(Debug, Serialize)]
+struct VerifiabilityWireRequest<'a> {
+    text: &'a str,
+}
+
+#[derive(Debug, Deserialize)]
+struct VerifiabilityWireResponse {
+    kind: String,
+    confidence: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct DistilBertVerifiabilityClassifier;
+
+impl VerifiabilityClassifier for DistilBertVerifiabilityClassifier {
+    fn classify(
+        &self,
+        claim: &SemanticClaim,
+    ) -> Result<SemanticClaimKind, String> {
+        let wire_request = VerifiabilityWireRequest {
+            text: claim.text.as_str(),
+        };
+
+        let input = serde_json::to_string(&wire_request)
+            .map_err(|error| {
+                format!("Failed to serialize verifiability request: {}", error)
+            })?;
+
+        let mut child = std::process::Command::new("python")
+            .arg("verifiability/classify.py")
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::inherit())
+            .spawn()
+            .map_err(|error| {
+                format!("Failed to start verifiability classifier: {}", error)
+            })?;
+
+        {
+            use std::io::Write;
+
+            let stdin = child
+                .stdin
+                .as_mut()
+                .ok_or_else(|| {
+                    "Failed to open verifiability classifier stdin".to_string()
+                })?;
+
+            stdin
+                .write_all(input.as_bytes())
+                .map_err(|error| {
+                    format!("Failed to send verifiability request: {}", error)
+                })?;
+        }
+
+        let output = child
+            .wait_with_output()
+            .map_err(|error| {
+                format!("Verifiability classifier process failed: {}", error)
+            })?;
+
+        if !output.status.success() {
+            return Err(format!(
+                "Verifiability classifier exited with status {}",
+                output.status
+            ));
+        }
+
+        let response: VerifiabilityWireResponse =
+            serde_json::from_slice(&output.stdout)
+                .map_err(|error| {
+                    format!("Invalid verifiability response: {}", error)
+                })?;
+
+        let _confidence = response.confidence;
+
+        match response.kind.as_str() {
+            "VERIFIABLE" => Ok(SemanticClaimKind::Verifiable),
+            "NON_VERIFIABLE" => Ok(SemanticClaimKind::NonVerifiable),
+            other => Err(format!(
+                "Unknown verifiability kind: {}",
+                other
+            )),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum FaithfulnessDecision {
     Faithful,
@@ -400,13 +487,37 @@ for claim in claims {
     }
 }
 
-Ok(safe_claims)
+let classifier = DistilBertVerifiabilityClassifier;
+let mut classified_claims = Vec::new();
+
+for mut claim in safe_claims {
+    claim.kind = classifier.classify(&claim)?;
+    classified_claims.push(claim);
+}
+
+Ok(classified_claims)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+        #[test]
+        fn distilbert_verifiability_classifier_classifies_factual_claim() {
+        let claim = SemanticClaim {
+            text: "The Moon is made primarily of cheese.".to_string(),
+            source_id: 1,
+            kind: SemanticClaimKind::NonVerifiable,
+        };
+
+        let classifier = DistilBertVerifiabilityClassifier;
+
+        let kind = classifier
+            .classify(&claim)
+            .expect("DistilBERT verifiability classification should run");
+
+        assert_eq!(kind, SemanticClaimKind::Verifiable);
+    }
         struct FaithfulnessCase {
         name: &'static str,
         source: &'static str,
@@ -442,7 +553,7 @@ fn t5_extractor_falls_back_on_unsafe_conditional_decomposition() {
 
         assert_eq!(
             claim.kind,
-            SemanticClaimKind::NonVerifiable
+            SemanticClaimKind::Verifiable
         );
     }
 }
@@ -847,6 +958,28 @@ fn t5_extractor_regression_baseline() {
         println!("SOURCE: {}", case.input);
         println!("EXPECTED: {:?}", expected);
         println!("ACTUAL:   {:?}", actual);
+
+                for claim in claims.iter().filter(|claim| claim.source_id == id) {
+            let expected_kind =
+                if case.expected_verifiable.contains(&claim.text.as_str()) {
+                    SemanticClaimKind::Verifiable
+                } else if case
+                    .expected_non_verifiable
+                    .contains(&claim.text.as_str())
+                {
+                    SemanticClaimKind::NonVerifiable
+                } else {
+                    continue;
+                };
+
+            assert_eq!(
+                claim.kind,
+                expected_kind,
+                "Wrong verifiability classification in case: {} — {}",
+                case.name,
+                claim.text
+            );
+        }
     }
 }
 

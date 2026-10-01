@@ -90,6 +90,119 @@ def evaluate(name: str, dataset: pd.DataFrame, model, tokenizer, device) -> None
     )
 
 
+def analyze_false_negatives(
+    dataset: pd.DataFrame,
+    model,
+    tokenizer,
+    device,
+    limit: int = 30,
+) -> None:
+    verifiable = dataset[
+        dataset["label"] == "VERIFIABLE"
+    ].copy()
+
+    errors = []
+
+    model.eval()
+
+    for _, row in verifiable.iterrows():
+        inputs = tokenizer(
+            row["text"],
+            return_tensors="pt",
+            truncation=True,
+            max_length=256,
+        ).to(device)
+
+        with torch.no_grad():
+            logits = model(**inputs).logits
+
+        probabilities = torch.softmax(logits, dim=-1)[0]
+        predicted_id = int(torch.argmax(probabilities).item())
+
+        if predicted_id == 0:
+            errors.append(
+                {
+                    "text": row["text"],
+                    "source": row["source_dataset"],
+                    "nv_confidence": float(probabilities[0].item()),
+                }
+            )
+
+    errors.sort(
+        key=lambda error: error["nv_confidence"],
+        reverse=True,
+    )
+
+    modal_terms = (
+        "may",
+        "might",
+        "could",
+        "suggest",
+        "suggests",
+        "suggested",
+        "likely",
+        "possibly",
+        "potentially",
+        "expected",
+        "predict",
+        "predicts",
+        "predicted",
+        "estimate",
+        "estimates",
+        "estimated",
+    )
+
+    modal_errors = [
+        error
+        for error in errors
+        if any(
+            term in error["text"].lower().split()
+            for term in modal_terms
+        )
+    ]
+
+    all_verifiable_texts = verifiable["text"].str.lower()
+
+    modal_verifiable = sum(
+        any(
+            term in text.split()
+            for term in modal_terms
+        )
+        for text in all_verifiable_texts
+    )
+
+    print("\n=== Modal / uncertainty false negatives ===")
+    print(f"Modal verifiable examples: {modal_verifiable}")
+    print(f"Modal false negatives: {len(modal_errors)}")
+
+    if modal_verifiable:
+        print(
+            "Modal false-negative rate: "
+            f"{len(modal_errors) / modal_verifiable:.3f}"
+        )
+
+    print(
+        "Overall false-negative rate: "
+        f"{len(errors) / len(verifiable):.3f}"
+    )
+
+    for error in modal_errors[:20]:
+        print(
+            f"\n[{error['source']}] "
+            f"NV confidence={error['nv_confidence']:.3f}"
+        )
+        print(error["text"])
+
+    print("\n=== VERIFIABLE → NON_VERIFIABLE errors ===")
+    print(f"Total false negatives: {len(errors)}")
+
+    for index, error in enumerate(errors[:limit], start=1):
+        print(
+            f"\n{index}. [{error['source']}] "
+            f"NV confidence={error['nv_confidence']:.3f}"
+        )
+        print(error["text"])
+
 def main() -> None:
     device = torch.device(
         "mps" if torch.backends.mps.is_available() else "cpu"
@@ -140,6 +253,12 @@ def main() -> None:
         tokenizer,
         device,
     )
+
+    analyze_false_negatives(
+    validation,
+    model,
+    tokenizer,
+    device,)
 
 
 if __name__ == "__main__":
