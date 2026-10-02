@@ -123,58 +123,31 @@ impl VerifiabilityClassifier for DistilBertVerifiabilityClassifier {
             text: claim.text.as_str(),
         };
 
-        let input = serde_json::to_string(&wire_request)
-            .map_err(|error| {
-                format!("Failed to serialize verifiability request: {}", error)
-            })?;
-
-        let mut child = std::process::Command::new("python")
-            .arg("verifiability/classify.py")
-            .stdin(std::process::Stdio::piped())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::inherit())
-            .spawn()
-            .map_err(|error| {
-                format!("Failed to start verifiability classifier: {}", error)
-            })?;
-
-        {
-            use std::io::Write;
-
-            let stdin = child
-                .stdin
-                .as_mut()
-                .ok_or_else(|| {
-                    "Failed to open verifiability classifier stdin".to_string()
-                })?;
-
-            stdin
-                .write_all(input.as_bytes())
-                .map_err(|error| {
-                    format!("Failed to send verifiability request: {}", error)
-                })?;
-        }
-
-        let output = child
-            .wait_with_output()
-            .map_err(|error| {
-                format!("Verifiability classifier process failed: {}", error)
-            })?;
-
-        if !output.status.success() {
-            return Err(format!(
-                "Verifiability classifier exited with status {}",
-                output.status
-            ));
-        }
-
-        let response: VerifiabilityWireResponse =
-            serde_json::from_slice(&output.stdout)
-                .map_err(|error| {
-                    format!("Invalid verifiability response: {}", error)
-                })?;
-
-        let _confidence = response.confidence;
+        let response = reqwest::blocking::Client::new()
+    .post("http://127.0.0.1:8001/verifiability")
+    .json(&wire_request)
+    .send()
+    .map_err(|error| {
+        format!(
+            "Failed to call verifiability model service: {}",
+            error
+        )
+    })?
+    .error_for_status()
+    .map_err(|error| {
+        format!(
+            "Verifiability model service returned an error: {}",
+            error
+        )
+    })?
+    .json::<VerifiabilityWireResponse>()
+    .map_err(|error| {
+        format!(
+            "Invalid verifiability model service response: {}",
+            error
+        )
+    })?;
+                let _confidence = response.confidence;
 
         match response.kind.as_str() {
             "VERIFIABLE" => Ok(SemanticClaimKind::Verifiable),
@@ -249,44 +222,30 @@ impl FaithfulnessGate for NliFaithfulnessGate {
     candidate: claim.text.as_str(),
 };
 
-let input = serde_json::to_string(&wire_request)
-    .map_err(|error| format!("Failed to serialize faithfulness request: {}", error))?;
-
-let mut child = std::process::Command::new("python")
-    .arg("faithfulness/evaluate.py")
-    .stdin(std::process::Stdio::piped())
-    .stdout(std::process::Stdio::piped())
-    .stderr(std::process::Stdio::inherit())
-    .spawn()
-    .map_err(|error| format!("Failed to start faithfulness evaluator: {}", error))?;
-
-{
-    use std::io::Write;
-
-    let stdin = child
-        .stdin
-        .as_mut()
-        .ok_or_else(|| "Failed to open faithfulness evaluator stdin".to_string())?;
-
-    stdin
-        .write_all(input.as_bytes())
-        .map_err(|error| format!("Failed to send faithfulness request: {}", error))?;
-}
-
-let output = child
-    .wait_with_output()
-    .map_err(|error| format!("Faithfulness evaluator process failed: {}", error))?;
-
-if !output.status.success() {
-    return Err(format!(
-        "Faithfulness evaluator exited with status {}",
-        output.status
-    ));
-}
-
-let response: FaithfulnessWireResponse =
-    serde_json::from_slice(&output.stdout)
-        .map_err(|error| format!("Invalid faithfulness response: {}", error))?;
+        let response = reqwest::blocking::Client::new()
+            .post("http://127.0.0.1:8001/faithfulness")
+            .json(&wire_request)
+            .send()
+            .map_err(|error| {
+                format!(
+                    "Failed to call faithfulness model service: {}",
+                    error
+                )
+            })?
+            .error_for_status()
+            .map_err(|error| {
+                format!(
+                    "Faithfulness model service returned an error: {}",
+                    error
+                )
+            })?
+            .json::<FaithfulnessWireResponse>()
+            .map_err(|error| {
+                format!(
+                    "Invalid faithfulness model service response: {}",
+                    error
+                )
+            })?;
 
 let decision = match response.decision.as_str() {
     "faithful" => FaithfulnessDecision::Faithful,
