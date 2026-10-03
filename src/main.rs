@@ -17,7 +17,6 @@ use axum::{
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::io::Write;
-use std::process::{Command, Stdio};
 use tacer::types::RetrievalAction;
 use tacer::{build_evidence_state, choose_action};
 
@@ -86,32 +85,15 @@ struct VerificationResponse {
 fn verify(claim: &str, evidence: Vec<&str>) -> VerificationResponse {
     let input = VerificationInput { claim, evidence };
 
-    let json = serde_json::to_string(&input).expect("Could not create verifier JSON");
-
-    let mut child = Command::new("python")
-        .arg("verifier/verify.py")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .expect("Could not start verifier");
-
-    child
-        .stdin
-        .as_mut()
-        .expect("Could not open verifier stdin")
-        .write_all(json.as_bytes())
-        .expect("Could not send input to verifier");
-
-    let output = child.wait_with_output().expect("Verifier failed");
-
-    if !output.status.success() {
-        panic!(
-            "Verifier exited with error:\n{}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
-
-    serde_json::from_slice(&output.stdout).expect("Could not parse verifier result")
+        reqwest::blocking::Client::new()
+        .post("http://127.0.0.1:8001/verify")
+        .json(&input)
+        .send()
+        .expect("Could not call verifier model service")
+        .error_for_status()
+        .expect("Verifier model service returned an error")
+        .json::<VerificationResponse>()
+        .expect("Could not parse verifier model service response")
 }
 
 // --------------------------------------------------

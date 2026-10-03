@@ -3,9 +3,6 @@ use super::EvidencePassage;
 use serde::Deserialize;
 use serde_json::json;
 
-use std::io::Write;
-use std::process::{Command, Stdio};
-
 #[derive(Debug, Clone)]
 pub struct ScoredEvidencePassage {
     pub passage: EvidencePassage,
@@ -35,35 +32,30 @@ pub fn rank_passages(
         "passages": passage_texts,
     });
 
-    let mut child = Command::new("python")
-        .arg("reranker/rerank.py")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .map_err(|error| format!("Could not start reranker: {}", error))?;
-
-    {
-        let stdin = child
-            .stdin
-            .as_mut()
-            .ok_or("Could not open reranker stdin".to_string())?;
-
-        stdin
-            .write_all(input.to_string().as_bytes())
-            .map_err(|error| format!("Could not send passages to reranker: {}", error))?;
-    }
-
-    let output = child
-        .wait_with_output()
-        .map_err(|error| format!("Reranker process failed: {}", error))?;
-
-    if !output.status.success() {
-        return Err(format!("Reranker exited with status {}", output.status));
-    }
-
-    let response: RerankerResponse = serde_json::from_slice(&output.stdout)
-        .map_err(|error| format!("Could not parse reranker output: {}", error))?;
+    let response = reqwest::blocking::Client::new()
+        .post("http://127.0.0.1:8001/rerank")
+        .json(&input)
+        .send()
+        .map_err(|error| {
+            format!(
+                "Failed to call reranker model service: {}",
+                error
+            )
+        })?
+        .error_for_status()
+        .map_err(|error| {
+            format!(
+                "Reranker model service returned an error: {}",
+                error
+            )
+        })?
+        .json::<RerankerResponse>()
+        .map_err(|error| {
+            format!(
+                "Invalid reranker model service response: {}",
+                error
+            )
+        })?;
 
     if response.scores.len() != passages.len() {
         return Err(format!(

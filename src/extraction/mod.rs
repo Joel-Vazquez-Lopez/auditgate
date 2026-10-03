@@ -377,45 +377,33 @@ impl ClaimExtractor for T5ClaimExtractor {
                 .collect(),
         };
 
-        let input = serde_json::to_string(&wire_request)
-            .map_err(|error| format!("Failed to serialize extraction request: {}", error))?;
-
-        let mut child = std::process::Command::new("python")
-            .arg("extractor/extract.py")
-            .stdin(std::process::Stdio::piped())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::inherit())
-            .spawn()
-            .map_err(|error| format!("Failed to start claim extractor: {}", error))?;
-
-        {
-            use std::io::Write;
-
-            let stdin = child
-                .stdin
-                .as_mut()
-                .ok_or_else(|| "Failed to open claim extractor stdin".to_string())?;
-
-            stdin
-                .write_all(input.as_bytes())
-                .map_err(|error| format!("Failed to send extraction request: {}", error))?;
-        }
-
-        let output = child
-            .wait_with_output()
-            .map_err(|error| format!("Claim extractor process failed: {}", error))?;
-
-        if !output.status.success() {
-            return Err(format!(
-                "Claim extractor exited with status {}",
-                output.status
-            ));
-        }
-
-        let response: ExtractionWireResponse = serde_json::from_slice(&output.stdout)
-            .map_err(|error| format!("Invalid claim extractor response: {}", error))?;
+        let response = reqwest::blocking::Client::new()
+            .post("http://127.0.0.1:8001/extract")
+            .json(&wire_request)
+            .send()
+            .map_err(|error| {
+                format!(
+                    "Failed to call extraction model service: {}",
+                    error
+                )
+            })?
+            .error_for_status()
+            .map_err(|error| {
+                format!(
+                    "Extraction model service returned an error: {}",
+                    error
+                )
+            })?
+            .json::<ExtractionWireResponse>()
+            .map_err(|error| {
+                format!(
+                    "Invalid extraction model service response: {}",
+                    error
+                )
+            })?;
 
         let claims = validate_wire_response(request, response)?;
+
 let gate = NliFaithfulnessGate;
 let mut safe_claims = Vec::new();
 

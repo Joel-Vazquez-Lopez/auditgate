@@ -1,4 +1,5 @@
 from pathlib import Path
+from threading import Lock
 
 import torch
 from fastapi import FastAPI
@@ -28,6 +29,8 @@ RERANKER_MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 device = torch.device(
     "mps" if torch.backends.mps.is_available() else "cpu"
 )
+
+inference_lock = Lock()
 
 
 # --------------------------------------------------
@@ -142,8 +145,9 @@ def classify_verifiability(
         max_length=256,
     ).to(device)
 
-    with torch.no_grad():
-        logits = verifiability_model(**inputs).logits
+    with inference_lock:
+        with torch.no_grad():
+            logits = verifiability_model(**inputs).logits
 
     probabilities = torch.softmax(logits, dim=-1)[0]
     predicted_id = int(torch.argmax(probabilities).item())
@@ -179,8 +183,9 @@ def evaluate_faithfulness(
         truncation=True,
     ).to(device)
 
-    with torch.no_grad():
-        logits = nli_model(**inputs).logits
+    with inference_lock:
+        with torch.no_grad():
+            logits = nli_model(**inputs).logits
 
     probabilities = torch.softmax(logits, dim=1)[0]
 
@@ -223,8 +228,9 @@ def verify(
         padding=True,
     ).to(device)
 
-    with torch.no_grad():
-        logits = nli_model(**inputs).logits
+    with inference_lock:
+        with torch.no_grad():
+            logits = nli_model(**inputs).logits
 
     probabilities = torch.softmax(logits, dim=1)
 
@@ -265,11 +271,12 @@ def extract(
             max_length=512,
         ).to(device)
 
-        with torch.no_grad():
-            outputs = extraction_model.generate(
-                **inputs,
-                max_new_tokens=128,
-            )
+        with inference_lock:
+            with torch.no_grad():
+                outputs = extraction_model.generate(
+                    **inputs,
+                    max_new_tokens=128,
+                )
 
         generated = extraction_tokenizer.decode(
             outputs[0],
@@ -305,7 +312,8 @@ def rerank(
         for passage in request.passages
     ]
 
-    scores = reranker_model.predict(pairs)
+    with inference_lock:
+        scores = reranker_model.predict(pairs)
 
     return {
         "scores": [
