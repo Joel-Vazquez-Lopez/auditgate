@@ -14,20 +14,18 @@ pub fn rerank<'a>(
     let mut results: Vec<RerankedEvidence<'a>> = candidates
         .iter()
         .map(|candidate| {
-            let passage_terms =
-                important_terms(&candidate.passage.text);
+            let passage_terms = important_terms(&candidate.passage.text);
 
             let matched = claim_terms
                 .iter()
                 .filter(|term| passage_terms.contains(term))
                 .count();
 
-            let relevance_score =
-                if claim_terms.is_empty() {
-                    0.0
-                } else {
-                    matched as f64 / claim_terms.len() as f64
-                };
+            let relevance_score = if claim_terms.is_empty() {
+                0.0
+            } else {
+                matched as f64 / claim_terms.len() as f64
+            };
 
             RerankedEvidence {
                 candidate,

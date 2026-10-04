@@ -85,7 +85,7 @@ struct VerificationResponse {
 fn verify(claim: &str, evidence: Vec<&str>) -> VerificationResponse {
     let input = VerificationInput { claim, evidence };
 
-        reqwest::blocking::Client::new()
+    reqwest::blocking::Client::new()
         .post("http://127.0.0.1:8001/verify")
         .json(&input)
         .send()
