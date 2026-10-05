@@ -147,10 +147,12 @@ enum ClaimKind {
 
 struct AuditedClaim {
     claim: ExtractedClaim,
-    audit: AuditResult,
+    audit: Option<AuditResult>,
 }
 
 struct TextAuditResult {
+    decision: String,
+    reason: String,
     claims: Vec<AuditedClaim>,
 }
 
@@ -184,6 +186,8 @@ struct AuditedClaimResponse {
 
 #[derive(Serialize)]
 struct TextAuditResponse {
+    decision: String,
+    reason: String,
     claims: Vec<AuditedClaimResponse>,
 }
 
@@ -268,18 +272,31 @@ async fn audit_text_handler(
     })?;
 
     let claims = text_audit
-        .claims
-        .into_iter()
-        .map(|audited_claim| AuditedClaimResponse {
+    .claims
+    .into_iter()
+    .map(|audited_claim| match audited_claim.audit {
+        Some(audit) => AuditedClaimResponse {
             claim: audited_claim.claim.text,
-            decision: audited_claim.audit.decision.decision,
-            reason: audited_claim.audit.decision.reason,
-            evidence: audited_claim.audit.evidence,
-            tacer_trace: audited_claim.audit.tacer_trace,
-        })
-        .collect();
+            decision: audit.decision.decision,
+            reason: audit.decision.reason,
+            evidence: audit.evidence,
+            tacer_trace: audit.tacer_trace,
+        },
+        None => AuditedClaimResponse {
+            claim: audited_claim.claim.text,
+            decision: "NO_CHECK_NEEDED".to_string(),
+            reason: "Claim was classified as non-verifiable.".to_string(),
+            evidence: Vec::new(),
+            tacer_trace: Vec::new(),
+        },
+    })
+    .collect();
 
-    Ok(Json(TextAuditResponse { claims }))
+    Ok(Json(TextAuditResponse {
+    decision: text_audit.decision,
+    reason: text_audit.reason,
+    claims,
+}))
 }
 
 async fn run_server() {
@@ -310,9 +327,14 @@ fn main() {
     match extract_claims(text) {
         Ok(claims) => {
             for (index, claim) in claims.iter().enumerate() {
-                println!("{}. {}", index + 1, claim.text);
-            }
+            println!(
+                "{}. [{:?}] {}",
+                index + 1,
+                claim.kind,
+                claim.text
+            );
         }
+    }
         Err(error) => {
             eprintln!("Claim extraction failed: {}", error);
         }
@@ -341,15 +363,36 @@ fn main() {
 // compound sentences into atomic claims.
 
 fn extract_claims(text: &str) -> Result<Vec<ExtractedClaim>, String> {
-    let claims = text
-        .split(['.', '!', '?'])
-        .map(str::trim)
-        .filter(|sentence| !sentence.is_empty())
-        .map(|sentence| ExtractedClaim {
+    use extraction::{
+        ClaimExtractor, ExtractionRequest, SemanticClaimKind, SourceUnit, T5ClaimExtractor,
+    };
+
+    let sources = text
+    .split_inclusive(['.', '!', '?'])
+    .map(str::trim)
+    .filter(|sentence| !sentence.is_empty())
+    .enumerate()
+    .map(|(id, sentence)| SourceUnit {
+        id,
         text: sentence.to_string(),
-        source_text: sentence.to_string(),
-        kind: ClaimKind::Verifiable,
     })
+    .collect();
+
+    let request = ExtractionRequest { sources };
+
+    let extractor = T5ClaimExtractor;
+    let semantic_claims = extractor.extract(&request)?;
+
+    let claims = semantic_claims
+        .into_iter()
+        .map(|claim| ExtractedClaim {
+            text: claim.text,
+            source_text: text.to_string(),
+            kind: match claim.kind {
+                SemanticClaimKind::Verifiable => ClaimKind::Verifiable,
+                SemanticClaimKind::NonVerifiable => ClaimKind::NonVerifiable,
+            },
+        })
         .collect();
 
     Ok(claims)
@@ -360,7 +403,10 @@ fn audit_text(text: &str) -> Result<TextAuditResult, String> {
     let mut audited_claims = Vec::new();
 
     for claim in extracted_claims {
-        let audit = audit_claim(claim.text.clone())?;
+        let audit = match claim.kind {
+            ClaimKind::Verifiable => Some(audit_claim(claim.text.clone())?),
+            ClaimKind::NonVerifiable => None,
+        };
 
         audited_claims.push(AuditedClaim {
             claim,
@@ -368,9 +414,51 @@ fn audit_text(text: &str) -> Result<TextAuditResult, String> {
         });
     }
 
-    Ok(TextAuditResult {
-        claims: audited_claims,
-    })
+    let has_block = audited_claims.iter().any(|claim| {
+    claim
+        .audit
+        .as_ref()
+        .is_some_and(|audit| audit.decision.decision == "BLOCK")
+});
+
+let has_review = audited_claims.iter().any(|claim| {
+    claim
+        .audit
+        .as_ref()
+        .is_some_and(|audit| audit.decision.decision == "REVIEW")
+});
+
+let has_audited_claims = audited_claims
+    .iter()
+    .any(|claim| claim.audit.is_some());
+
+let (decision, reason) = if has_block {
+    (
+        "BLOCK".to_string(),
+        "At least one verifiable claim is contradicted by the retrieved evidence.".to_string(),
+    )
+} else if has_review {
+    (
+        "REVIEW".to_string(),
+        "At least one verifiable claim requires further review.".to_string(),
+    )
+} else if has_audited_claims {
+    (
+        "ALLOW".to_string(),
+        "All verifiable claims are supported by the retrieved evidence.".to_string(),
+    )
+} else {
+    (
+        "NO_CHECK_NEEDED".to_string(),
+        "No verifiable claims were identified.".to_string(),
+    )
+};
+
+Ok(TextAuditResult {
+    decision,
+    reason,
+    claims: audited_claims,
+})
 }
     fn audit_claim(claim: String) -> Result<AuditResult, String> {
 
