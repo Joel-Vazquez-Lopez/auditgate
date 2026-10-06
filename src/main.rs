@@ -3,6 +3,7 @@ mod decision;
 mod overlap;
 mod tacer;
 mod extraction;
+mod document;
 
 use acquisition::{
     SearchProvider, SearchRequest, SourceFetcher, TavilySearchProvider, extract_passages,
@@ -135,7 +136,11 @@ struct Args {
 #[derive(Serialize, Debug, Clone)]
 struct ExtractedClaim {
     text: String,
+    source_id: usize,
     source_text: String,
+    page: Option<usize>,
+    paragraph: Option<usize>,
+    section: Option<String>,
     kind: ClaimKind,
 }
 
@@ -175,9 +180,15 @@ struct TextAuditRequest {
     text: String,
 }
 
+
 #[derive(Serialize)]
 struct AuditedClaimResponse {
     claim: String,
+    source_id: usize,
+    source_text: String,
+    page: Option<usize>,
+    paragraph: Option<usize>,
+    section: Option<String>,
     decision: String,
     reason: String,
     evidence: Vec<AuditEvidence>,
@@ -274,22 +285,36 @@ async fn audit_text_handler(
     let claims = text_audit
     .claims
     .into_iter()
-    .map(|audited_claim| match audited_claim.audit {
+    .map(|audited_claim| {
+    let claim = audited_claim.claim;
+
+    match audited_claim.audit {
         Some(audit) => AuditedClaimResponse {
-            claim: audited_claim.claim.text,
+            claim: claim.text,
+            source_id: claim.source_id,
+            source_text: claim.source_text,
+            page: claim.page,
+            paragraph: claim.paragraph,
+            section: claim.section,
             decision: audit.decision.decision,
             reason: audit.decision.reason,
             evidence: audit.evidence,
             tacer_trace: audit.tacer_trace,
         },
         None => AuditedClaimResponse {
-            claim: audited_claim.claim.text,
+            claim: claim.text,
+            source_id: claim.source_id,
+            source_text: claim.source_text,
+            page: claim.page,
+            paragraph: claim.paragraph,
+            section: claim.section,
             decision: "NO_CHECK_NEEDED".to_string(),
             reason: "Claim was classified as non-verifiable.".to_string(),
             evidence: Vec::new(),
             tacer_trace: Vec::new(),
         },
-    })
+    }
+})
     .collect();
 
     Ok(Json(TextAuditResponse {
@@ -328,15 +353,77 @@ fn main() {
         Ok(claims) => {
             for (index, claim) in claims.iter().enumerate() {
             println!(
-                "{}. [{:?}] {}",
+                "{}. [{:?}] {}\n   source_id: {}\n   source_text: {}",
                 index + 1,
                 claim.kind,
-                claim.text
+                claim.text,
+                claim.source_id,
+                claim.source_text
             );
         }
     }
         Err(error) => {
             eprintln!("Claim extraction failed: {}", error);
+        }
+    }
+
+    return;
+}
+
+if args.claim.starts_with("document:") {
+    let path = args.claim.trim_start_matches("document:").trim();
+
+    let document = if path.ends_with(".pdf") {
+        match document::parse_pdf(path, path) {
+            Ok(document) => document,
+            Err(error) => {
+                eprintln!("Could not parse document: {}", error);
+                std::process::exit(1);
+            }
+        }
+    } else if path.ends_with(".docx") {
+        match document::parse_docx(path, path) {
+            Ok(document) => document,
+            Err(error) => {
+                eprintln!("Could not parse document: {}", error);
+                std::process::exit(1);
+            }
+        }
+    } else {
+        let text = match std::fs::read_to_string(path) {
+            Ok(text) => text,
+            Err(error) => {
+                eprintln!("Could not read document: {}", error);
+                std::process::exit(1);
+            }
+        };
+
+        if path.ends_with(".md") {
+            document::parse_markdown(path, &text)
+        } else {
+            document::parse_text(path, &text)
+        }
+    };
+
+
+    match extract_claims_from_sources(document.sources) {
+        Ok(claims) => {
+            for (index, claim) in claims.iter().enumerate() {
+                println!(
+                    "{}. [{:?}] {}\n   source_id: {}\n   page: {:?}\n   paragraph: {:?}\n   section: {:?}\n   source_text: {}",
+                    index + 1,
+                    claim.kind,
+                    claim.text,
+                    claim.source_id,
+                    claim.page,
+                    claim.paragraph,
+                    claim.section,
+                    claim.source_text
+                );
+            }
+        }
+        Err(error) => {
+            eprintln!("Document claim extraction failed: {}", error);
         }
     }
 
@@ -363,20 +450,31 @@ fn main() {
 // compound sentences into atomic claims.
 
 fn extract_claims(text: &str) -> Result<Vec<ExtractedClaim>, String> {
-    use extraction::{
-        ClaimExtractor, ExtractionRequest, SemanticClaimKind, SourceUnit, T5ClaimExtractor,
-    };
+    use extraction::SourceUnit;
 
     let sources = text
-    .split_inclusive(['.', '!', '?'])
-    .map(str::trim)
-    .filter(|sentence| !sentence.is_empty())
-    .enumerate()
-    .map(|(id, sentence)| SourceUnit {
-        id,
-        text: sentence.to_string(),
-    })
-    .collect();
+        .split_inclusive(['.', '!', '?'])
+        .map(str::trim)
+        .filter(|sentence| !sentence.is_empty())
+        .enumerate()
+        .map(|(id, sentence)| SourceUnit {
+            id,
+            text: sentence.to_string(),
+            page: None,
+            paragraph: Some(id),
+            section: None,
+        })
+        .collect();
+
+    extract_claims_from_sources(sources)
+}
+
+fn extract_claims_from_sources(
+    sources: Vec<extraction::SourceUnit>,
+) -> Result<Vec<ExtractedClaim>, String> {
+    use extraction::{
+        ClaimExtractor, ExtractionRequest, SemanticClaimKind, T5ClaimExtractor,
+    };
 
     let request = ExtractionRequest { sources };
 
@@ -385,13 +483,26 @@ fn extract_claims(text: &str) -> Result<Vec<ExtractedClaim>, String> {
 
     let claims = semantic_claims
         .into_iter()
-        .map(|claim| ExtractedClaim {
-            text: claim.text,
-            source_text: text.to_string(),
-            kind: match claim.kind {
-                SemanticClaimKind::Verifiable => ClaimKind::Verifiable,
-                SemanticClaimKind::NonVerifiable => ClaimKind::NonVerifiable,
-            },
+        .map(|claim| {
+            let source = request
+                .sources
+                .iter()
+                .find(|source| source.id == claim.source_id);
+
+            ExtractedClaim {
+                text: claim.text,
+                source_id: claim.source_id,
+                source_text: source
+                    .map(|source| source.text.clone())
+                    .unwrap_or_default(),
+                page: source.and_then(|source| source.page),
+                paragraph: source.and_then(|source| source.paragraph),
+                section: source.and_then(|source| source.section.clone()),
+                kind: match claim.kind {
+                    SemanticClaimKind::Verifiable => ClaimKind::Verifiable,
+                    SemanticClaimKind::NonVerifiable => ClaimKind::NonVerifiable,
+                },
+            }
         })
         .collect();
 

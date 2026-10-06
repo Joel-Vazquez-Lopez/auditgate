@@ -4,6 +4,9 @@ use serde::{Deserialize, Serialize};
 pub struct SourceUnit {
     pub id: usize,
     pub text: String,
+    pub page: Option<usize>,
+    pub paragraph: Option<usize>,
+    pub section: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -366,43 +369,53 @@ impl ClaimExtractor for T5ClaimExtractor {
         &self,
         request: &ExtractionRequest,
     ) -> Result<Vec<Self::Output>, String> {
-        let wire_request = ExtractionWireRequest {
-            sources: request
-                .sources
-                .iter()
-                .map(|source| ExtractionWireSource {
-                    id: source.id,
-                    text: source.text.as_str(),
-                })
-                .collect(),
-        };
+        let client = reqwest::blocking::Client::new();
+let mut claims = Vec::new();
 
-        let response = reqwest::blocking::Client::new()
-            .post("http://127.0.0.1:8001/extract")
-            .json(&wire_request)
-            .send()
-            .map_err(|error| {
-                format!(
-                    "Failed to call extraction model service: {}",
-                    error
-                )
-            })?
-            .error_for_status()
-            .map_err(|error| {
-                format!(
-                    "Extraction model service returned an error: {}",
-                    error
-                )
-            })?
-            .json::<ExtractionWireResponse>()
-            .map_err(|error| {
-                format!(
-                    "Invalid extraction model service response: {}",
-                    error
-                )
-            })?;
+for source_batch in request.sources.chunks(8) {
+    let wire_request = ExtractionWireRequest {
+        sources: source_batch
+            .iter()
+            .map(|source| ExtractionWireSource {
+                id: source.id,
+                text: source.text.as_str(),
+            })
+            .collect(),
+    };
 
-        let claims = validate_wire_response(request, response)?;
+    let response = client
+        .post("http://127.0.0.1:8001/extract")
+        .json(&wire_request)
+        .send()
+        .map_err(|error| {
+            format!(
+                "Failed to call extraction model service: {error:?}"
+            )
+        })?
+        .error_for_status()
+        .map_err(|error| {
+            format!(
+                "Extraction model service returned an error: {}",
+                error
+            )
+        })?
+        .json::<ExtractionWireResponse>()
+        .map_err(|error| {
+            format!(
+                "Invalid extraction model service response: {}",
+                error
+            )
+        })?;
+
+    let batch_request = ExtractionRequest {
+        sources: source_batch.to_vec(),
+    };
+
+    claims.extend(validate_wire_response(
+        &batch_request,
+        response,
+    )?);
+}
 
 let gate = NliFaithfulnessGate;
 let mut safe_claims = Vec::new();
