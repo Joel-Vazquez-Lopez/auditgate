@@ -324,12 +324,190 @@ async fn audit_text_handler(
 }))
 }
 
+async fn audit_document_handler(
+    mut multipart: axum::extract::Multipart,
+) -> Result<Json<TextAuditResponse>, (StatusCode, Json<ErrorResponse>)> {
+    let field = multipart
+        .next_field()
+        .await
+        .map_err(|error| (
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "invalid_upload".to_string(),
+                message: error.to_string(),
+            }),
+        ))?
+        .ok_or_else(|| (
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "missing_file".to_string(),
+                message: "Upload a file using the 'file' field.".to_string(),
+            }),
+        ))?;
+
+    let filename = field.file_name().unwrap_or("").to_string();
+
+    let valid_format = [".txt", ".md", ".pdf", ".docx"]
+        .iter()
+        .any(|extension| filename.to_ascii_lowercase().ends_with(extension));
+
+    if field.name() != Some("file") || !valid_format {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "invalid_file".to_string(),
+                message: "Expected a 'file' field containing TXT, MD, PDF, or DOCX.".to_string(),
+            }),
+        ));
+    }
+
+    let bytes = field.bytes().await.map_err(|error| (
+        StatusCode::BAD_REQUEST,
+        Json(ErrorResponse {
+            error: "invalid_upload".to_string(),
+            message: error.to_string(),
+        }),
+    ))?;
+
+    if bytes.is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "empty_file".to_string(),
+                message: "The uploaded file is empty.".to_string(),
+            }),
+        ));
+    }
+
+    let document = if filename.to_ascii_lowercase().ends_with(".txt")
+        || filename.to_ascii_lowercase().ends_with(".md")
+    {
+        let text = String::from_utf8(bytes.to_vec()).map_err(|error| (
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "invalid_encoding".to_string(),
+                message: format!("Expected UTF-8 text: {error}"),
+            }),
+        ))?;
+
+        if filename.to_ascii_lowercase().ends_with(".md") {
+            document::parse_markdown(&filename, &text)
+        } else {
+            document::parse_text(&filename, &text)
+        }
+    } else {
+    let is_pdf = filename.to_ascii_lowercase().ends_with(".pdf");
+
+    let suffix = if is_pdf { ".pdf" } else { ".docx" };
+
+    let mut temporary_file = tempfile::Builder::new()
+        .suffix(suffix)
+        .tempfile()
+        .map_err(|error| (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ErrorResponse {
+                error: "temporary_file_failed".to_string(),
+                message: error.to_string(),
+            }),
+        ))?;
+
+    use std::io::Write;
+
+    temporary_file.write_all(&bytes).map_err(|error| (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(ErrorResponse {
+            error: "temporary_file_failed".to_string(),
+            message: error.to_string(),
+        }),
+    ))?;
+
+    let path = temporary_file.path().to_string_lossy().into_owned();
+
+    let result = if is_pdf {
+        document::parse_pdf(&filename, &path)
+    } else {
+        document::parse_docx(&filename, &path)
+    };
+
+    result.map_err(|error| (
+        StatusCode::BAD_REQUEST,
+        Json(ErrorResponse {
+            error: "document_parse_failed".to_string(),
+            message: error,
+        }),
+    ))?
+};
+
+    let audit_result = tokio::task::spawn_blocking(move || {
+        let claims = extract_claims_from_sources(document.sources)?;
+        audit_extracted_claims(claims)
+    })
+    .await
+    .map_err(|error| (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(ErrorResponse {
+            error: "audit_task_failed".to_string(),
+            message: error.to_string(),
+        }),
+    ))?;
+
+    let text_audit = audit_result.map_err(|error| (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(ErrorResponse {
+            error: "document_audit_failed".to_string(),
+            message: error,
+        }),
+    ))?;
+
+    let claims = text_audit
+    .claims
+    .into_iter()
+    .map(|audited_claim| {
+        let claim = audited_claim.claim;
+
+        match audited_claim.audit {
+            Some(audit) => AuditedClaimResponse {
+                claim: claim.text,
+                source_id: claim.source_id,
+                source_text: claim.source_text,
+                page: claim.page,
+                paragraph: claim.paragraph,
+                section: claim.section,
+                decision: audit.decision.decision,
+                reason: audit.decision.reason,
+                evidence: audit.evidence,
+                tacer_trace: audit.tacer_trace,
+            },
+            None => AuditedClaimResponse {
+                claim: claim.text,
+                source_id: claim.source_id,
+                source_text: claim.source_text,
+                page: claim.page,
+                paragraph: claim.paragraph,
+                section: claim.section,
+                decision: "NO_CHECK_NEEDED".to_string(),
+                reason: "Claim was classified as non-verifiable.".to_string(),
+                evidence: Vec::new(),
+                tacer_trace: Vec::new(),
+            },
+        }
+    })
+    .collect();
+
+Ok(Json(TextAuditResponse {
+    decision: text_audit.decision,
+    reason: text_audit.reason,
+    claims,
+}))
+}
+
 async fn run_server() {
     let app = Router::new()
         .route("/health/live", get(health_live))
         .route("/health/ready", get(health_ready))
         .route("/v1/audit", post(audit_handler))
-        .route("/v1/audit-text", post(audit_text_handler));
+        .route("/v1/audit-text", post(audit_text_handler))
+        .route("/v1/audit-document", post(audit_document_handler));
 
         
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
@@ -510,7 +688,12 @@ fn extract_claims_from_sources(
 }
 
 fn audit_text(text: &str) -> Result<TextAuditResult, String> {
-    let extracted_claims = extract_claims(text)?;
+    audit_extracted_claims(extract_claims(text)?)
+}
+
+fn audit_extracted_claims(
+    extracted_claims: Vec<ExtractedClaim>,
+) -> Result<TextAuditResult, String> {
     let mut audited_claims = Vec::new();
 
     for claim in extracted_claims {
