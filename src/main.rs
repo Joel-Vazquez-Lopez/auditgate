@@ -507,7 +507,11 @@ async fn run_server() {
         .route("/health/ready", get(health_ready))
         .route("/v1/audit", post(audit_handler))
         .route("/v1/audit-text", post(audit_text_handler))
-        .route("/v1/audit-document", post(audit_document_handler));
+        .route(
+            "/v1/audit-document",
+            post(audit_document_handler)
+                .layer(axum::extract::DefaultBodyLimit::max(10 * 1024 * 1024)),
+        );
 
         
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
